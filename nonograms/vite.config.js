@@ -2,12 +2,13 @@ import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  base: 'https://rolling-scopes-school.github.io/bitbybit-JSFE2024Q4/simon-says/',
+  base: 'https://rolling-scopes-school.github.io/bitbybit-JSFE2024Q4/nonograms/',
 
   resolve: {
     alias: {
       style: resolve(import.meta.dirname, './style'),
-      service: resolve(import.meta.dirname, './service')
+      service: resolve(import.meta.dirname, './service'),
+      board: resolve(import.meta.dirname, './board')
     }
   },
 
