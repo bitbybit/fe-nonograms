@@ -13,7 +13,7 @@ export class GameState {
   /**
    * @type {GameTemplate}
    */
-  template
+  #template
 
   /**
    * @type {Array<Array<boolean>>}
@@ -26,14 +26,28 @@ export class GameState {
   constructor({ level }) {
     this.level = level
     this.template = this.level.templates[0]
-
-    this.initBoard()
   }
 
-  initBoard() {
+  #initCells() {
     this.cells = new Array(this.template.verCellAmount).fill(
       new Array(this.template.horCellAmount).fill(false)
     )
+  }
+
+  /**
+   * @returns {GameTemplate}
+   */
+  get template() {
+    return this.#template
+  }
+
+  /**
+   * @param {GameTemplate} template
+   */
+  set template(template) {
+    this.#template = template
+
+    this.#initCells()
   }
 
   /**
