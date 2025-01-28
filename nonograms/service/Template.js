@@ -1,17 +1,19 @@
+import { Board } from 'service/Board.js'
+
 /**
  * @typedef {{
- *   board: string
- * }} GameTemplateProps
+ *   board: Board
+ * }} TemplateProps
  */
 
-export class GameTemplate {
+export class Template {
   /**
-   * @type {string}
+   * @type {Board}
    */
   #board
 
   /**
-   * @param {GameTemplateProps} props
+   * @param {TemplateProps} props
    */
   constructor({ board }) {
     this.#board = board
@@ -37,7 +39,7 @@ export class GameTemplate {
    * @returns {Array<string>}
    */
   get #rows() {
-    return this.#board.split('\n')
+    return this.#board.get().split('\n')
   }
 
   /**

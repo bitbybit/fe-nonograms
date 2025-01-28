@@ -11,7 +11,7 @@ export class GameState {
   level
 
   /**
-   * @type {GameTemplate}
+   * @type {Template}
    */
   #template
 
@@ -35,14 +35,14 @@ export class GameState {
   }
 
   /**
-   * @returns {GameTemplate}
+   * @returns {Template}
    */
   get template() {
     return this.#template
   }
 
   /**
-   * @param {GameTemplate} template
+   * @param {Template} template
    */
   set template(template) {
     this.#template = template

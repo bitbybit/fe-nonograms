@@ -1,7 +1,7 @@
 /**
  * @typedef {{
  *   name: string
- *   templates: GameTemplate[]
+ *   templates: Template[]
  *   title: string
  * }} GameLevelProps
  */
@@ -18,7 +18,7 @@ export class GameLevel {
   title
 
   /**
-   * @type {GameTemplate[]}
+   * @type {Template[]}
    */
   templates
 
