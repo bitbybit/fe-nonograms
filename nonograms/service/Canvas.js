@@ -12,7 +12,7 @@ import { Component } from 'service/Component.js'
  *   horHints: Array<Array<number>>
  *   verCellAmount: number
  *   verHints: Array<Array<number>>
- * }} CanvasInitProps
+ * }} CanvasDrawProps
  */
 
 export class Canvas extends Component {
@@ -47,10 +47,53 @@ export class Canvas extends Component {
   #color = '#000000'
 
   /**
+   * @type {string}
+   * @readonly
+   */
+  #colorBlank = '#ffffff'
+
+  /**
+   * @type {number}
+   * @readonly
+   */
+  #lineWidth = 1
+
+  /**
    * @type {number}
    * @readonly
    */
   #thickLineWidth = 3
+
+  /**
+   * @type {string}
+   * @readonly
+   */
+  #cellKeyDelimiter = ','
+
+  /**
+   * @type {CanvasDrawProps['horCellAmount']}
+   */
+  #horCellAmount = 0
+
+  /**
+   * @type {CanvasDrawProps['horHints']}
+   */
+  #horHints = []
+
+  /**
+   * @type {CanvasDrawProps['verCellAmount']}
+   */
+  #verCellAmount = 0
+
+  /**
+   * @type {CanvasDrawProps['verHints']}
+   */
+  #verHints = []
+
+  /**
+   * @type {Set<string>}
+   */
+  #filledCells = new Set()
 
   /**
    * @param {CanvasProps} props
@@ -67,141 +110,70 @@ export class Canvas extends Component {
       tagName: 'canvas'
     })
 
+    const boundHandleClick = this.#handleClick.bind(this)
+
     this.events.addEventListener('mount', () => {
-      console.log('On canvas mount')
+      this.$element.addEventListener('click', boundHandleClick)
     })
 
     this.events.addEventListener('unmount', () => {
-      console.log('On canvas unmount')
+      this.$element.removeEventListener('click', boundHandleClick)
     })
   }
 
   /**
-   * @param {CanvasInitProps} props
+   * @param {CanvasDrawProps} props
    */
   draw({ horCellAmount, horHints, verCellAmount, verHints }) {
     if (!this.#hasParent) {
       return
     }
 
-    const maxHorHints = this.#getMaxHorHints(horHints)
-    const maxVerHints = this.#getMaxVerHints(verHints)
-    const cellSize = this.#getCellSize(horCellAmount, maxVerHints)
-    const horHintPadding = this.#getHorHintPadding(maxHorHints, cellSize)
-    const verHintPadding = this.#getVerHintPadding(maxVerHints, cellSize)
+    this.#horCellAmount = horCellAmount
+    this.#horHints = horHints
+    this.#verCellAmount = verCellAmount
+    this.#verHints = verHints
 
-    const canvasWidth = this.#getCanvasWidth(
-      horCellAmount,
-      cellSize,
-      verHintPadding
-    )
-
-    const canvasHeight = this.#getCanvasHeight(
-      verCellAmount,
-      cellSize,
-      horHintPadding
-    )
-
-    this.#setSize(canvasWidth, canvasHeight)
-    this.#setFont(cellSize)
-
-    this.#drawHorGridLine(
-      verCellAmount,
-      horHintPadding,
-      cellSize,
-      verHintPadding,
-      canvasWidth
-    )
-
-    this.#drawVerGridLine(
-      horCellAmount,
-      verHintPadding,
-      cellSize,
-      horHintPadding,
-      canvasHeight
-    )
-
-    this.#highlightThickHorLines(
-      verCellAmount,
-      horHintPadding,
-      cellSize,
-      verHintPadding,
-      canvasWidth
-    )
-
-    this.#highlightThickVerLines(
-      horCellAmount,
-      verHintPadding,
-      cellSize,
-      horHintPadding,
-      canvasHeight
-    )
-
-    this.#drawHorHints(horHints, verHintPadding, cellSize, horHintPadding)
-    this.#drawVerHints(verHints, horHintPadding, cellSize, verHintPadding)
+    this.#setSize()
+    this.#setFont()
+    this.#drawHorGridLine()
+    this.#drawVerGridLine()
+    this.#highlightThickHorLines()
+    this.#highlightThickVerLines()
+    this.#drawHorHints()
+    this.#drawVerHints()
+    this.#refillCells()
   }
 
-  /**
-   * @param {CanvasInitProps['horCellAmount']} horCellAmount
-   * @param {number} verHintPadding
-   * @param {number} cellSize
-   * @param {number} horHintPadding
-   * @param {number} canvasHeight
-   */
-  #drawVerGridLine(
-    horCellAmount,
-    verHintPadding,
-    cellSize,
-    horHintPadding,
-    canvasHeight
-  ) {
-    for (let i = 0; i <= horCellAmount; i += 1) {
-      const x = verHintPadding + i * cellSize
+  #drawHorGridLine() {
+    for (let i = 0; i <= this.#verCellAmount; i += 1) {
+      const y = this.#horHintPadding + i * this.#cellSize
 
-      this.#drawLine(x, horHintPadding, x, canvasHeight)
+      this.#drawLine(this.#verHintPadding, y, this.#canvasWidth, y)
     }
   }
 
-  /**
-   * @param {CanvasInitProps['verCellAmount']} verCellAmount
-   * @param {number} horHintPadding
-   * @param {number} cellSize
-   * @param {number} verHintPadding
-   * @param {number} canvasWidth
-   */
-  #drawHorGridLine(
-    verCellAmount,
-    horHintPadding,
-    cellSize,
-    verHintPadding,
-    canvasWidth
-  ) {
-    for (let i = 0; i <= verCellAmount; i += 1) {
-      const y = horHintPadding + i * cellSize
+  #drawVerGridLine() {
+    for (let i = 0; i <= this.#horCellAmount; i += 1) {
+      const x = this.#verHintPadding + i * this.#cellSize
 
-      this.#drawLine(verHintPadding, y, canvasWidth, y)
+      this.#drawLine(x, this.#horHintPadding, x, this.#canvasHeight)
     }
   }
 
-  /**
-   * @param {CanvasInitProps['horHints']} horHints
-   * @param {number} verHintPadding
-   * @param {number} cellSize
-   * @param {number} horHintPadding
-   */
-  #drawHorHints(horHints, verHintPadding, cellSize, horHintPadding) {
-    const horHintsLength = horHints.length
+  #drawHorHints() {
+    const horHintsLength = this.#horHints.length
 
     for (let i = 0; i < horHintsLength; i += 1) {
-      const x = verHintPadding + i * cellSize + cellSize / 2
+      const x = this.#verHintPadding + i * this.#cellSize + this.#cellSize / 2
 
-      const hints = horHints[i]
+      const hints = this.#horHints[i]
       const hintsLength = hints.length
 
       for (let j = 0; j < hintsLength; j += 1) {
         const y =
-          horHintPadding -
-          (hintsLength - j) * (cellSize * this.#fontScale) -
+          this.#horHintPadding -
+          (hintsLength - j) * (this.#cellSize * this.#fontScale) -
           this.#cellPadding / 2
 
         this.#ctx2d.fillText(String(hints[j]), x, y)
@@ -209,25 +181,19 @@ export class Canvas extends Component {
     }
   }
 
-  /**
-   * @param {CanvasInitProps['verHints']} verHints
-   * @param {number} horHintPadding
-   * @param {number} cellSize
-   * @param {number} verHintPadding
-   */
-  #drawVerHints(verHints, horHintPadding, cellSize, verHintPadding) {
-    const verHintsLength = verHints.length
+  #drawVerHints() {
+    const verHintsLength = this.#verHints.length
 
     for (let i = 0; i < verHintsLength; i += 1) {
-      const y = horHintPadding + i * cellSize + cellSize / 2
+      const y = this.#horHintPadding + i * this.#cellSize + this.#cellSize / 2
 
-      const hints = verHints[i]
+      const hints = this.#verHints[i]
       const hintsLength = hints.length
 
       for (let j = 0; j < hintsLength; j += 1) {
         const x =
-          verHintPadding -
-          (hintsLength - j) * (cellSize * this.#fontScale) -
+          this.#verHintPadding -
+          (hintsLength - j) * (this.#cellSize * this.#fontScale) -
           this.#cellPadding / 2
 
         this.#ctx2d.fillText(String(hints[j]), x, y)
@@ -235,48 +201,34 @@ export class Canvas extends Component {
     }
   }
 
-  /**
-   * @param {CanvasInitProps['horCellAmount']} horCellAmount
-   * @param {number} verHintPadding
-   * @param {number} cellSize
-   * @param {number} horHintPadding
-   * @param {number} canvasHeight
-   */
-  #highlightThickVerLines(
-    horCellAmount,
-    verHintPadding,
-    cellSize,
-    horHintPadding,
-    canvasHeight
-  ) {
-    for (let i = 0; i <= horCellAmount; i += 1) {
+  #highlightThickVerLines() {
+    for (let i = 0; i <= this.#horCellAmount; i += 1) {
       if (i % 5 === 0) {
-        const x = verHintPadding + i * cellSize
+        const x = this.#verHintPadding + i * this.#cellSize
 
-        this.#drawLine(x, horHintPadding, x, canvasHeight, this.#thickLineWidth)
+        this.#drawLine(
+          x,
+          this.#horHintPadding,
+          x,
+          this.#canvasHeight,
+          this.#thickLineWidth
+        )
       }
     }
   }
 
-  /**
-   * @param {CanvasInitProps['verCellAmount']} verCellAmount
-   * @param {number} horHintPadding
-   * @param {number} cellSize
-   * @param {number} verHintPadding
-   * @param {number} canvasWidth
-   */
-  #highlightThickHorLines(
-    verCellAmount,
-    horHintPadding,
-    cellSize,
-    verHintPadding,
-    canvasWidth
-  ) {
-    for (let i = 0; i <= verCellAmount; i += 1) {
+  #highlightThickHorLines() {
+    for (let i = 0; i <= this.#verCellAmount; i += 1) {
       if (i % 5 === 0) {
-        const y = horHintPadding + i * cellSize
+        const y = this.#horHintPadding + i * this.#cellSize
 
-        this.#drawLine(verHintPadding, y, canvasWidth, y, this.#thickLineWidth)
+        this.#drawLine(
+          this.#verHintPadding,
+          y,
+          this.#canvasWidth,
+          y,
+          this.#thickLineWidth
+        )
       }
     }
   }
@@ -288,7 +240,7 @@ export class Canvas extends Component {
    * @param {number} y2
    * @param {number} width
    */
-  #drawLine(x1, y1, x2, y2, width = 1) {
+  #drawLine(x1, y1, x2, y2, width = this.#lineWidth) {
     this.#ctx2d.strokeStyle = this.#color
     this.#ctx2d.lineWidth = width
 
@@ -301,90 +253,127 @@ export class Canvas extends Component {
   }
 
   /**
-   * @param {CanvasInitProps['horHints']} horHints
-   * @returns {number}
+   * @param {PointerEvent} event
    */
-  #getMaxHorHints(horHints) {
-    return Math.max(...horHints.map((hints) => hints.length))
+  #handleClick(event) {
+    const x = event.offsetX
+    const y = event.offsetY
+    const isInGrid = x > this.#verHintPadding && y > this.#horHintPadding
+
+    if (isInGrid) {
+      const cellX = Math.floor((x - this.#verHintPadding) / this.#cellSize)
+      const cellY = Math.floor((y - this.#horHintPadding) / this.#cellSize)
+      const isInCells =
+        cellX < this.#horCellAmount && cellY < this.#verCellAmount
+
+      if (isInCells) {
+        this.#toggleCell(cellX, cellY)
+
+        this.events.dispatchEvent(
+          new CustomEvent('cell-click', {
+            detail: {
+              x: cellX,
+              y: cellY,
+              value: this.#getCellValue(cellX, cellY)
+            }
+          })
+        )
+      }
+    }
   }
 
   /**
-   * @param {CanvasInitProps['verHints']} verHints
-   * @returns {number}
+   * @param {number} cellX
+   * @param {number} cellY
    */
-  #getMaxVerHints(verHints) {
-    return Math.max(...verHints.map((hints) => hints.length))
+  #getCellKey(cellX, cellY) {
+    return `${cellX}${this.#cellKeyDelimiter}${cellY}`
   }
 
   /**
-   * @param {CanvasInitProps['horCellAmount']} horCellAmount
-   * @param {number} maxVerHints
-   * @returns {number}
+   * @param {number} cellX
+   * @param {number} cellY
    */
-  #getCellSize(horCellAmount, maxVerHints) {
-    return this.#parentWidth / (horCellAmount + maxVerHints)
+  #getCellValue(cellX, cellY) {
+    const key = this.#getCellKey(cellX, cellY)
+
+    return this.#filledCells.has(key)
   }
 
   /**
-   * @param {number} maxHorHints
-   * @param {number} cellSize
-   * @returns {number}
+   * @param {number} cellX
+   * @param {number} cellY
    */
-  #getHorHintPadding(maxHorHints, cellSize) {
-    return (
-      maxHorHints * cellSize * this.#fontScale * this.#hintSpacingFactor +
-      this.#cellPadding
+  #toggleCell(cellX, cellY) {
+    const isFilled = this.#getCellValue(cellX, cellY)
+
+    if (isFilled) {
+      this.#clearCell(cellX, cellY)
+    } else {
+      this.#fillCell(cellX, cellY)
+    }
+  }
+
+  /**
+   * @param {number} cellX
+   * @param {number} cellY
+   */
+  #clearCell(cellX, cellY) {
+    const x = this.#verHintPadding + cellX * this.#cellSize
+    const y = this.#horHintPadding + cellY * this.#cellSize
+
+    this.#ctx2d.fillStyle = this.#colorBlank
+
+    this.#ctx2d.fillRect(
+      x + this.#lineWidth,
+      y + this.#lineWidth,
+      this.#cellSize - this.#lineWidth * 2,
+      this.#cellSize - this.#lineWidth * 2
     )
+
+    this.#filledCells.delete(`${cellX},${cellY}`)
   }
 
   /**
-   * @param {number} maxVerHints
-   * @param {number} cellSize
-   * @returns {number}
+   * @param {number} cellX
+   * @param {number} cellY
    */
-  #getVerHintPadding(maxVerHints, cellSize) {
-    return (
-      maxVerHints * cellSize * this.#fontScale * this.#hintSpacingFactor +
-      this.#cellPadding
+  #fillCell(cellX, cellY) {
+    const x = this.#verHintPadding + cellX * this.#cellSize
+    const y = this.#horHintPadding + cellY * this.#cellSize
+
+    this.#ctx2d.fillStyle = this.#color
+
+    this.#ctx2d.fillRect(
+      x + this.#lineWidth,
+      y + this.#lineWidth,
+      this.#cellSize - this.#lineWidth * 2,
+      this.#cellSize - this.#lineWidth * 2
     )
+
+    this.#filledCells.add(`${cellX},${cellY}`)
   }
 
-  /**
-   * @param {CanvasInitProps['horCellAmount']} horCellAmount
-   * @param {number} cellSize
-   * @param {number} verHintPadding
-   * @returns {number}
-   */
-  #getCanvasWidth(horCellAmount, cellSize, verHintPadding) {
-    return horCellAmount * cellSize + verHintPadding
+  #refillCells() {
+    this.#filledCells.forEach((cellKey) => {
+      const [cellX, cellY] = cellKey.split(this.#cellKeyDelimiter).map(Number)
+
+      this.#fillCell(cellX, cellY)
+    })
   }
 
-  /**
-   * @param {CanvasInitProps['verCellAmount']} verCellAmount
-   * @param {number} cellSize
-   * @param {number} horHintPadding
-   * @returns {number}
-   */
-  #getCanvasHeight(verCellAmount, cellSize, horHintPadding) {
-    return verCellAmount * cellSize + horHintPadding
-  }
-
-  /**
-   * @param {number} width
-   * @param {number} height
-   */
-  #setSize(width, height) {
+  #setSize() {
     /**
      * @type {HTMLCanvasElement}
      */
     const $element = this.$element
 
-    $element.width = width
-    $element.height = height
+    $element.width = this.#canvasWidth
+    $element.height = this.#canvasHeight
   }
 
-  #setFont(cellSize) {
-    this.#ctx2d.font = `${cellSize * this.#fontScale}px ${this.#fontFamily}`
+  #setFont() {
+    this.#ctx2d.font = `${this.#cellSize * this.#fontScale}px ${this.#fontFamily}`
     this.#ctx2d.textAlign = 'center'
     this.#ctx2d.textBaseline = 'middle'
   }
@@ -420,5 +409,66 @@ export class Canvas extends Component {
    */
   get #parentWidth() {
     return this.#_$parent?.clientWidth ?? 0
+  }
+
+  /**
+   * @returns {number}
+   */
+  get #maxHorHints() {
+    return Math.max(...this.#horHints.map((hints) => hints.length))
+  }
+
+  /**
+   * @returns {number}
+   */
+  get #maxVerHints() {
+    return Math.max(...this.#verHints.map((hints) => hints.length))
+  }
+
+  /**
+   * @returns {number}
+   */
+  get #cellSize() {
+    return this.#parentWidth / (this.#horCellAmount + this.#maxVerHints)
+  }
+
+  /**
+   * @returns {number}
+   */
+  get #horHintPadding() {
+    return (
+      this.#maxHorHints *
+        this.#cellSize *
+        this.#fontScale *
+        this.#hintSpacingFactor +
+      this.#cellPadding
+    )
+  }
+
+  /**
+   * @returns {number}
+   */
+  get #verHintPadding() {
+    return (
+      this.#maxVerHints *
+        this.#cellSize *
+        this.#fontScale *
+        this.#hintSpacingFactor +
+      this.#cellPadding
+    )
+  }
+
+  /**
+   * @returns {number}
+   */
+  get #canvasWidth() {
+    return this.#horCellAmount * this.#cellSize + this.#verHintPadding
+  }
+
+  /**
+   * @returns {number}
+   */
+  get #canvasHeight() {
+    return this.#verCellAmount * this.#cellSize + this.#horHintPadding
   }
 }
