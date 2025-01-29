@@ -71,6 +71,12 @@ export class Game {
     this.#canvas.events.addEventListener('unmount', () => {
       window.removeEventListener('resize', boundDrawCanvas)
     })
+
+    this.#canvas.events.addEventListener('cell-click', (event) => {
+      const { x, y, value } = event.detail
+
+      this.#state.cells[y][x] = value
+    })
   }
 
   #drawCanvas() {
