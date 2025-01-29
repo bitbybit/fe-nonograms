@@ -29,7 +29,7 @@ export class GameState {
   }
 
   #initCells() {
-    this.cells = new Array(this.template.verCellAmount).fill(
+    this.cells = Array.from({ length: this.template.verCellAmount }, () =>
       new Array(this.template.horCellAmount).fill(false)
     )
   }
