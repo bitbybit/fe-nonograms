@@ -3,8 +3,6 @@
  *   $container: HTMLElement | undefined
  *   classList: string[] | undefined
  *   name: string
- *   onMount: (($element: HTMLElement) => {}) | undefined
- *   onUnmount: (($element: HTMLElement) => {}) | undefined
  *   tagName: string | undefined
  * }} ComponentProps
  */
@@ -16,14 +14,17 @@ export class Component {
   $element
 
   /**
+   * @type {EventTarget}
+   */
+  events = new EventTarget()
+
+  /**
    * @param {ComponentProps} props
    */
   constructor({
     $container = document.body,
     classList = [],
     name,
-    onMount = () => {},
-    onUnmount = () => {},
     tagName = 'div'
   } = {}) {
     if (name === undefined) {
@@ -33,7 +34,13 @@ export class Component {
     const $existedElement = $container.querySelector(`[data-name=${name}]`)
 
     if ($container.contains($existedElement)) {
-      onUnmount($existedElement)
+      requestAnimationFrame(() =>
+        this.events.dispatchEvent(
+          new CustomEvent('unmount', {
+            detail: { $element: this.$element }
+          })
+        )
+      )
 
       $existedElement.replaceChildren()
       $container.removeChild($existedElement)
@@ -45,6 +52,12 @@ export class Component {
 
     $container.appendChild(this.$element)
 
-    onMount(this.$element)
+    requestAnimationFrame(() =>
+      this.events.dispatchEvent(
+        new CustomEvent('mount', {
+          detail: { $element: this.$element }
+        })
+      )
+    )
   }
 }

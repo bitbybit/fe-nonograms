@@ -41,7 +41,6 @@ export class Game {
     this.#initState()
     this.#initContainer()
     this.#initCanvas()
-    this.#drawCanvas()
   }
 
   #initState() {
@@ -61,15 +60,16 @@ export class Game {
     const boundDrawCanvas = this.#drawCanvas.bind(this)
 
     this.#canvas = new Canvas({
-      $container: this.#container.$element,
+      $container: this.#container.$element
+    })
 
-      onMount() {
-        window.addEventListener('resize', boundDrawCanvas)
-      },
+    this.#canvas.events.addEventListener('mount', () => {
+      this.#drawCanvas()
+      window.addEventListener('resize', boundDrawCanvas)
+    })
 
-      onUnmount() {
-        window.removeEventListener('resize', boundDrawCanvas)
-      }
+    this.#canvas.events.addEventListener('unmount', () => {
+      window.removeEventListener('resize', boundDrawCanvas)
     })
   }
 

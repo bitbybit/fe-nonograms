@@ -66,12 +66,24 @@ export class Canvas extends Component {
       name: 'canvas',
       tagName: 'canvas'
     })
+
+    this.events.addEventListener('mount', () => {
+      console.log('On canvas mount')
+    })
+
+    this.events.addEventListener('unmount', () => {
+      console.log('On canvas unmount')
+    })
   }
 
   /**
    * @param {CanvasInitProps} props
    */
   draw({ horCellAmount, horHints, verCellAmount, verHints }) {
+    if (!this.#hasParent) {
+      return
+    }
+
     const maxHorHints = this.#getMaxHorHints(horHints)
     const maxVerHints = this.#getMaxVerHints(verHints)
     const cellSize = this.#getCellSize(horCellAmount, maxVerHints)
@@ -390,9 +402,23 @@ export class Canvas extends Component {
   }
 
   /**
+   * @returns {boolean}
+   */
+  get #hasParent() {
+    return this.#_$parent !== null
+  }
+
+  /**
+   * @returns {HTMLElement|null}
+   */
+  get #_$parent() {
+    return this.$element.parentElement
+  }
+
+  /**
    * @returns {number}
    */
   get #parentWidth() {
-    return this.$element.parentElement.clientWidth
+    return this.#_$parent?.clientWidth ?? 0
   }
 }
