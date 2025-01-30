@@ -4,6 +4,18 @@ import easyCross from 'board/easy/cross.json'
 import easySquare from 'board/easy/square.json'
 import easyTriangle from 'board/easy/triangle.json'
 
+import mediumConcentricSquares from 'board/medium/concentric-squares.json'
+import mediumDiamond from 'board/medium/diamond.json'
+import mediumHorizontalBars from 'board/medium/horizontal-bars.json'
+import mediumLargeX from 'board/medium/large-x.json'
+import mediumWindow from 'board/medium/window.json'
+
+import hardBox from 'board/hard/box.json'
+import hardFirTree from 'board/hard/fir-tree.json'
+import hardHourglass from 'board/hard/hourglass.json'
+import hardHouse from 'board/hard/house.json'
+import hardStar from 'board/hard/star.json'
+
 /**
  * @typedef {
  *   'arrow-up' |
@@ -15,11 +27,23 @@ import easyTriangle from 'board/easy/triangle.json'
  */
 
 /**
- * @typedef {string} BoardMediumName
+ * @typedef {
+ *   'concentric-squares' |
+ *   'diamond' |
+ *   'horizontal-bars' |
+ *   'large-x' |
+ *   'window'
+ * } BoardMediumName
  */
 
 /**
- * @typedef {string} BoardHardName
+ * @typedef {
+ *   'box' |
+ *   'fir-tree' |
+ *   'hourglass' |
+ *   'house' |
+ *   'star'
+ * } BoardHardName
  */
 
 /**
@@ -46,7 +70,7 @@ export class Board {
   /**
    * @type {BoardName}
    */
-  #name
+  name
 
   /**
    * @param {BoardProps} props
@@ -54,7 +78,7 @@ export class Board {
    */
   constructor({ difficulty, name }) {
     this.#difficulty = difficulty
-    this.#name = name
+    this.name = name
   }
 
   /**
@@ -84,7 +108,7 @@ export class Board {
     /**
      * @type {BoardEasyName}
      */
-    const name = this.#name
+    const name = this.name
 
     switch (name) {
       case 'arrow-up':
@@ -112,7 +136,30 @@ export class Board {
    * @throws {Error}
    */
   get #medium() {
-    throw new Error(`Unknown board name ${this.#name} (medium)`)
+    /**
+     * @type {BoardMediumName}
+     */
+    const name = this.name
+
+    switch (name) {
+      case 'concentric-squares':
+        return mediumConcentricSquares
+
+      case 'diamond':
+        return mediumDiamond
+
+      case 'horizontal-bars':
+        return mediumHorizontalBars
+
+      case 'large-x':
+        return mediumLargeX
+
+      case 'window':
+        return mediumWindow
+
+      default:
+        throw new Error(`Unknown board name ${name} (medium)`)
+    }
   }
 
   /**
@@ -120,6 +167,29 @@ export class Board {
    * @throws {Error}
    */
   get #hard() {
-    throw new Error(`Unknown board name ${this.#name} (hard)`)
+    /**
+     * @type {BoardHardName}
+     */
+    const name = this.name
+
+    switch (name) {
+      case 'box':
+        return hardBox
+
+      case 'fir-tree':
+        return hardFirTree
+
+      case 'hourglass':
+        return hardHourglass
+
+      case 'house':
+        return hardHouse
+
+      case 'star':
+        return hardStar
+
+      default:
+        throw new Error(`Unknown board name ${name} (hard)`)
+    }
   }
 }

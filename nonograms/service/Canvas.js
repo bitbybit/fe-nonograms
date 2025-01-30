@@ -15,6 +15,16 @@ import { Component } from 'service/Component.js'
  * }} CanvasDrawProps
  */
 
+/**
+ * @typedef {{
+ *   detail: {
+ *     x: number
+ *     y: number
+ *     value: boolean
+ *   }
+ * }} CanvasPayload
+ */
+
 export class Canvas extends Component {
   /**
    * @type {number}
@@ -26,13 +36,19 @@ export class Canvas extends Component {
    * @type {number}
    * @readonly
    */
+  #parentScale = 0.9
+
+  /**
+   * @type {number}
+   * @readonly
+   */
   #fontScale = 0.5
 
   /**
    * @type {number}
    * @readonly
    */
-  #hintSpacingFactor = 1.2
+  #hintSpacingFactor = 1.4
 
   /**
    * @type {string}
@@ -270,7 +286,7 @@ export class Canvas extends Component {
         this.#toggleCell(cellX, cellY)
 
         this.events.dispatchEvent(
-          new CustomEvent('cell-click', {
+          new CustomEvent('update', {
             detail: {
               x: cellX,
               y: cellY,
@@ -362,6 +378,14 @@ export class Canvas extends Component {
     })
   }
 
+  clearCells() {
+    this.#filledCells.forEach((cellKey) => {
+      const [cellX, cellY] = cellKey.split(this.#cellKeyDelimiter).map(Number)
+
+      this.#clearCell(cellX, cellY)
+    })
+  }
+
   #setSize() {
     /**
      * @type {HTMLCanvasElement}
@@ -408,7 +432,7 @@ export class Canvas extends Component {
    * @returns {number}
    */
   get #parentWidth() {
-    return this.#_$parent?.clientWidth ?? 0
+    return (this.#_$parent?.clientWidth ?? 0) * this.#parentScale
   }
 
   /**

@@ -3,20 +3,27 @@ import { Board } from 'service/Board.js'
 /**
  * @typedef {{
  *   board: Board
+ *   title: string
  * }} TemplateProps
  */
 
 export class Template {
   /**
+   * @type {string}
+   */
+  title
+
+  /**
    * @type {Board}
    */
-  #board
+  board
 
   /**
    * @param {TemplateProps} props
    */
-  constructor({ board }) {
-    this.#board = board
+  constructor({ board, title }) {
+    this.board = board
+    this.title = title
   }
 
   /**
@@ -39,7 +46,7 @@ export class Template {
    * @returns {Array<string>}
    */
   get #rows() {
-    return this.#board.get().split('\n')
+    return this.board.get().split('\n')
   }
 
   /**
