@@ -7,35 +7,35 @@ export const hardLevel = new GameLevel({
   title: 'Hard',
   templates: [
     new Template({
-      title: 'Box',
+      title: 'Hard: Box',
       board: new Board({
         difficulty: 'hard',
         name: 'box'
       })
     }),
     new Template({
-      title: 'Fir Tree',
+      title: 'Hard: Fir Tree',
       board: new Board({
         difficulty: 'hard',
         name: 'fir-tree'
       })
     }),
     new Template({
-      title: 'Hourglass',
+      title: 'Hard: Hourglass',
       board: new Board({
         difficulty: 'hard',
         name: 'hourglass'
       })
     }),
     new Template({
-      title: 'House',
+      title: 'Hard: House',
       board: new Board({
         difficulty: 'hard',
         name: 'house'
       })
     }),
     new Template({
-      title: 'Star',
+      title: 'Hard: Star',
       board: new Board({
         difficulty: 'hard',
         name: 'star'

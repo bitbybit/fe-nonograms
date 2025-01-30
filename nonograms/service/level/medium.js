@@ -7,35 +7,35 @@ export const mediumLevel = new GameLevel({
   title: 'Medium',
   templates: [
     new Template({
-      title: 'Concentric Squares',
+      title: 'Medium: Concentric Squares',
       board: new Board({
         difficulty: 'medium',
         name: 'concentric-squares'
       })
     }),
     new Template({
-      title: 'Diamond',
+      title: 'Medium: Diamond',
       board: new Board({
         difficulty: 'medium',
         name: 'diamond'
       })
     }),
     new Template({
-      title: 'Horizontal Bars',
+      title: 'Medium: Horizontal Bars',
       board: new Board({
         difficulty: 'medium',
         name: 'horizontal-bars'
       })
     }),
     new Template({
-      title: 'Large X',
+      title: 'Medium: Large X',
       board: new Board({
         difficulty: 'medium',
         name: 'large-x'
       })
     }),
     new Template({
-      title: 'Window',
+      title: 'Medium: Window',
       board: new Board({
         difficulty: 'medium',
         name: 'window'

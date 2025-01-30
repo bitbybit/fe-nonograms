@@ -7,35 +7,35 @@ export const easyLevel = new GameLevel({
   title: 'Easy',
   templates: [
     new Template({
-      title: 'Square',
+      title: 'Easy: Square',
       board: new Board({
         difficulty: 'easy',
         name: 'square'
       })
     }),
     new Template({
-      title: 'Arrow',
+      title: 'Easy: Arrow',
       board: new Board({
         difficulty: 'easy',
         name: 'arrow-up'
       })
     }),
     new Template({
-      title: 'Cross',
+      title: 'Easy: Cross',
       board: new Board({
         difficulty: 'easy',
         name: 'cross'
       })
     }),
     new Template({
-      title: 'Triangle',
+      title: 'Easy: Triangle',
       board: new Board({
         difficulty: 'easy',
         name: 'triangle'
       })
     }),
     new Template({
-      title: 'Checkerboard',
+      title: 'Easy: Checkerboard',
       board: new Board({
         difficulty: 'easy',
         name: 'checkerboard'
