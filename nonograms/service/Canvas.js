@@ -136,10 +136,12 @@ export class Canvas extends Component {
 
     this.events.addEventListener('mount', () => {
       this.$element.addEventListener('click', boundHandleClick)
+      this.$element.addEventListener('contextmenu', boundHandleClick)
     })
 
     this.events.addEventListener('unmount', () => {
       this.$element.removeEventListener('click', boundHandleClick)
+      this.$element.removeEventListener('contextmenu', boundHandleClick)
     })
   }
 
@@ -288,6 +290,8 @@ export class Canvas extends Component {
    * @param {PointerEvent} event
    */
   #handleClick(event) {
+    event.preventDefault()
+
     const x = event.offsetX
     const y = event.offsetY
     const isInGrid = x > this.#verHintPadding && y > this.#horHintPadding
