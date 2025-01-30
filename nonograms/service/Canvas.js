@@ -30,6 +30,12 @@ export class Canvas extends Component {
    * @type {number}
    * @readonly
    */
+  #cellBlockAmount = 5
+
+  /**
+   * @type {number}
+   * @readonly
+   */
   #cellPadding = 10
 
   /**
@@ -165,7 +171,12 @@ export class Canvas extends Component {
     for (let i = 0; i <= this.#verCellAmount; i += 1) {
       const y = this.#horHintPadding + i * this.#cellSize
 
-      this.#drawLine(this.#verHintPadding, y, this.#canvasWidth, y)
+      const shouldHintsBeDivided =
+        i % this.#cellBlockAmount === 0 && i !== 0 && i !== this.#verCellAmount
+
+      const x = shouldHintsBeDivided ? 0 : this.#verHintPadding
+
+      this.#drawLine(x, y, this.#canvasWidth, y)
     }
   }
 
@@ -173,7 +184,12 @@ export class Canvas extends Component {
     for (let i = 0; i <= this.#horCellAmount; i += 1) {
       const x = this.#verHintPadding + i * this.#cellSize
 
-      this.#drawLine(x, this.#horHintPadding, x, this.#canvasHeight)
+      const shouldHintsBeDivided =
+        i % this.#cellBlockAmount === 0 && i !== 0 && i !== this.#horCellAmount
+
+      const y = shouldHintsBeDivided ? 0 : this.#horHintPadding
+
+      this.#drawLine(x, y, x, this.#canvasHeight)
     }
   }
 
@@ -219,7 +235,7 @@ export class Canvas extends Component {
 
   #highlightThickVerLines() {
     for (let i = 0; i <= this.#horCellAmount; i += 1) {
-      if (i % 5 === 0) {
+      if (i % this.#cellBlockAmount === 0) {
         const x = this.#verHintPadding + i * this.#cellSize
 
         this.#drawLine(
@@ -235,7 +251,7 @@ export class Canvas extends Component {
 
   #highlightThickHorLines() {
     for (let i = 0; i <= this.#verCellAmount; i += 1) {
-      if (i % 5 === 0) {
+      if (i % this.#cellBlockAmount === 0) {
         const y = this.#horHintPadding + i * this.#cellSize
 
         this.#drawLine(
