@@ -28,7 +28,7 @@ export class GameState {
     this.template = this.level.templates[0]
   }
 
-  #initCells() {
+  initDefaultCells() {
     this.cells = Array.from({ length: this.template.verCellAmount }, () =>
       new Array(this.template.horCellAmount).fill(false)
     )
@@ -47,7 +47,7 @@ export class GameState {
   set template(template) {
     this.#template = template
 
-    this.#initCells()
+    this.initDefaultCells()
   }
 
   /**

@@ -2,6 +2,7 @@ import { GameConfig } from 'service/model/GameConfig.js'
 import { GameState } from 'service/model/GameState.js'
 import { Component } from 'service/Component.js'
 import { Selector } from 'service/Selector.js'
+import { Reset } from 'service/Reset.js'
 import { Canvas } from 'service/Canvas.js'
 
 import { easyLevel } from 'service/level/easy.js'
@@ -33,6 +34,11 @@ export class Game {
   /**
    * @type {Component}
    */
+  #resetWrapper
+
+  /**
+   * @type {Component}
+   */
   #canvasWrapper
 
   /**
@@ -49,6 +55,7 @@ export class Game {
     this.#initState()
     this.#initContainer()
     this.#initSelector()
+    this.#initReset()
     this.#initCanvas()
   }
 
@@ -72,7 +79,13 @@ export class Game {
 
     this.#selectorWrapper = new Component({
       name: 'selector-wrapper',
-      classList: ['col-6', 'p-2'],
+      classList: ['col-5', 'p-2', 'text-center'],
+      $container: rows.$element
+    })
+
+    this.#resetWrapper = new Component({
+      name: 'reset-wrapper',
+      classList: ['col-3', 'p-2', 'text-center'],
       $container: rows.$element
     })
 
@@ -102,6 +115,17 @@ export class Game {
         this.#drawCanvas()
       }
     )
+  }
+
+  #initReset() {
+    const reset = new Reset({
+      $container: this.#resetWrapper.$element
+    })
+
+    reset.events.addEventListener('click', () => {
+      this.#state.initDefaultCells()
+      this.#canvas.clearCells()
+    })
   }
 
   #initCanvas() {
