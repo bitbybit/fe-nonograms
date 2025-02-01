@@ -3,6 +3,7 @@ import { GameState } from 'service/model/GameState.js'
 import { Component } from 'service/Component.js'
 import { Selector } from 'service/Selector.js'
 import { Reset } from 'service/Reset.js'
+import { Stopwatch } from 'service/Stopwatch.js'
 import { Canvas } from 'service/Canvas.js'
 
 import { easyLevel } from 'service/level/easy.js'
@@ -39,7 +40,17 @@ export class Game {
   /**
    * @type {Component}
    */
+  #stopwatchWrapper
+
+  /**
+   * @type {Component}
+   */
   #canvasWrapper
+
+  /**
+   * @type {Stopwatch}
+   */
+  #stopwatch
 
   /**
    * @type {Canvas}
@@ -56,6 +67,7 @@ export class Game {
     this.#initContainer()
     this.#initSelector()
     this.#initReset()
+    this.#initStopwatch()
     this.#initCanvas()
   }
 
@@ -79,13 +91,19 @@ export class Game {
 
     this.#selectorWrapper = new Component({
       name: 'selector-wrapper',
-      classList: ['col-5', 'p-2', 'text-center'],
+      classList: ['col-4', 'p-2', 'text-center'],
       $container: rows.$element
     })
 
     this.#resetWrapper = new Component({
       name: 'reset-wrapper',
-      classList: ['col-3', 'p-2', 'text-center'],
+      classList: ['col-4', 'p-2', 'text-center'],
+      $container: rows.$element
+    })
+
+    this.#stopwatchWrapper = new Component({
+      name: 'stopwatch-wrapper',
+      classList: ['col-4', 'p-2', 'text-center'],
       $container: rows.$element
     })
 
@@ -123,8 +141,15 @@ export class Game {
     })
 
     reset.events.addEventListener('click', () => {
+      this.#stopwatch.reset()
       this.#state.initDefaultCells()
       this.#canvas.clearCells()
+    })
+  }
+
+  #initStopwatch() {
+    this.#stopwatch = new Stopwatch({
+      $container: this.#stopwatchWrapper.$element
     })
   }
 
@@ -150,6 +175,8 @@ export class Game {
        * @param {CanvasPayload} payload
        */
       ({ detail }) => {
+        this.#stopwatch.start()
+
         const { x, y, value } = detail
 
         this.#state.cells[y][x] = value
