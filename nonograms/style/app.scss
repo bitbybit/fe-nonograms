@@ -1,0 +1,24 @@
+$header-border-radius: 8px;
+
+[data-name="container"] {
+  min-height: 100vh;
+  max-width: 600px;
+}
+
+[data-name="selector-wrapper"],
+[data-name="reset-wrapper"],
+[data-name="stopwatch-wrapper"] {
+  height: 60px;
+}
+
+[data-name="selector-wrapper"] {
+  border-bottom-left-radius: $header-border-radius;
+}
+
+[data-name="stopwatch-wrapper"] {
+  border-bottom-right-radius: $header-border-radius;
+}
+
+[data-name="canvas-wrapper"] {
+  height: 100%;
+}
