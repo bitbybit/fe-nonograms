@@ -118,6 +118,11 @@ export class Canvas extends Component {
   #filledCells = new Set()
 
   /**
+   * @type {Set<string>}
+   */
+  #placeholderCells = new Set()
+
+  /**
    * @param {CanvasProps} props
    */
   constructor({ $container, ...componentProps } = {}) {
@@ -133,15 +138,16 @@ export class Canvas extends Component {
     })
 
     const boundHandleClick = this.#handleClick.bind(this)
+    const boundHandleRightClick = this.#handleRightClick.bind(this)
 
     this.events.addEventListener('mount', () => {
       this.$element.addEventListener('click', boundHandleClick)
-      this.$element.addEventListener('contextmenu', boundHandleClick)
+      this.$element.addEventListener('contextmenu', boundHandleRightClick)
     })
 
     this.events.addEventListener('unmount', () => {
       this.$element.removeEventListener('click', boundHandleClick)
-      this.$element.removeEventListener('contextmenu', boundHandleClick)
+      this.$element.removeEventListener('contextmenu', boundHandleRightClick)
     })
   }
 
@@ -290,32 +296,75 @@ export class Canvas extends Component {
    * @param {PointerEvent} event
    */
   #handleClick(event) {
+    const { isInCells, cellX, cellY } = this.#offsetToCell(event)
+
+    if (isInCells) {
+      this.#toggleCell(cellX, cellY)
+      this.#dispatchUpdate(cellX, cellY)
+    }
+  }
+
+  /**
+   * @param {PointerEvent} event
+   */
+  #handleRightClick(event) {
     event.preventDefault()
 
+    const { isInCells, cellX, cellY } = this.#offsetToCell(event)
+
+    if (isInCells) {
+      this.#toggleCellPlaceholder(cellX, cellY)
+      this.#dispatchUpdate(cellX, cellY)
+    }
+  }
+
+  /**
+   * @param {PointerEvent} event
+   * @returns {{
+   *   cellX: number
+   *   cellY: number
+   *   isInCells: boolean
+   * }}
+   */
+  #offsetToCell(event) {
     const x = event.offsetX
     const y = event.offsetY
+
     const isInGrid = x > this.#verHintPadding && y > this.#horHintPadding
 
+    let isInCells = false
+
+    let cellX = -1
+    let cellY = -1
+
     if (isInGrid) {
-      const cellX = Math.floor((x - this.#verHintPadding) / this.#cellSize)
-      const cellY = Math.floor((y - this.#horHintPadding) / this.#cellSize)
-      const isInCells =
-        cellX < this.#horCellAmount && cellY < this.#verCellAmount
+      cellX = Math.floor((x - this.#verHintPadding) / this.#cellSize)
+      cellY = Math.floor((y - this.#horHintPadding) / this.#cellSize)
 
-      if (isInCells) {
-        this.#toggleCell(cellX, cellY)
-
-        this.events.dispatchEvent(
-          new CustomEvent('update', {
-            detail: {
-              x: cellX,
-              y: cellY,
-              value: this.#getCellValue(cellX, cellY)
-            }
-          })
-        )
-      }
+      isInCells = cellX < this.#horCellAmount && cellY < this.#verCellAmount
     }
+
+    return {
+      cellX,
+      cellY,
+      isInCells
+    }
+  }
+
+  /**
+   * @param {number} cellX
+   * @param {number} cellY
+   */
+  #dispatchUpdate(cellX, cellY) {
+    this.events.dispatchEvent(
+      new CustomEvent('update', {
+        detail: {
+          x: cellX,
+          y: cellY,
+          value: this.#getCellValue(cellX, cellY)
+        }
+      })
+    )
   }
 
   /**
@@ -340,6 +389,16 @@ export class Canvas extends Component {
    * @param {number} cellX
    * @param {number} cellY
    */
+  #getCellPlaceholder(cellX, cellY) {
+    const key = this.#getCellKey(cellX, cellY)
+
+    return this.#placeholderCells.has(key)
+  }
+
+  /**
+   * @param {number} cellX
+   * @param {number} cellY
+   */
   #toggleCell(cellX, cellY) {
     const isFilled = this.#getCellValue(cellX, cellY)
 
@@ -348,6 +407,28 @@ export class Canvas extends Component {
     } else {
       this.#fillCell(cellX, cellY)
     }
+  }
+
+  /**
+   * @param {number} cellX
+   * @param {number} cellY
+   */
+  #toggleCellPlaceholder(cellX, cellY) {
+    const isPlaceholder = this.#getCellPlaceholder(cellX, cellY)
+
+    if (isPlaceholder) {
+      this.#clearCell(cellX, cellY)
+
+      return
+    }
+
+    const isFilled = this.#getCellValue(cellX, cellY)
+
+    if (isFilled) {
+      this.#clearCell(cellX, cellY)
+    }
+
+    this.#setCellPlaceholder(cellX, cellY)
   }
 
   /**
@@ -367,7 +448,8 @@ export class Canvas extends Component {
       this.#cellSize - this.#lineWidth * 2
     )
 
-    this.#filledCells.delete(`${cellX},${cellY}`)
+    this.#placeholderCells.delete(this.#getCellKey(cellX, cellY))
+    this.#filledCells.delete(this.#getCellKey(cellX, cellY))
   }
 
   /**
@@ -387,7 +469,34 @@ export class Canvas extends Component {
       this.#cellSize - this.#lineWidth * 2
     )
 
-    this.#filledCells.add(`${cellX},${cellY}`)
+    this.#placeholderCells.delete(this.#getCellKey(cellX, cellY))
+    this.#filledCells.add(this.#getCellKey(cellX, cellY))
+  }
+
+  /**
+   * @param {number} cellX
+   * @param {number} cellY
+   */
+  #setCellPlaceholder(cellX, cellY) {
+    const x = this.#verHintPadding + cellX * this.#cellSize
+    const y = this.#horHintPadding + cellY * this.#cellSize
+
+    const centerX = x + this.#cellSize / 2
+    const centerY = y + this.#cellSize / 2
+    const halfSize = this.#cellSize / 4
+
+    this.#ctx2d.strokeStyle = this.#color
+    this.#ctx2d.lineWidth = this.#thickLineWidth
+
+    this.#ctx2d.beginPath()
+    this.#ctx2d.moveTo(centerX - halfSize, centerY - halfSize)
+    this.#ctx2d.lineTo(centerX + halfSize, centerY + halfSize)
+    this.#ctx2d.moveTo(centerX + halfSize, centerY - halfSize)
+    this.#ctx2d.lineTo(centerX - halfSize, centerY + halfSize)
+    this.#ctx2d.stroke()
+
+    this.#filledCells.delete(this.#getCellKey(cellX, cellY))
+    this.#placeholderCells.add(this.#getCellKey(cellX, cellY))
   }
 
   #refillCells() {
@@ -396,10 +505,18 @@ export class Canvas extends Component {
 
       this.#fillCell(cellX, cellY)
     })
+
+    this.#placeholderCells.forEach((cellKey) => {
+      const [cellX, cellY] = cellKey.split(this.#cellKeyDelimiter).map(Number)
+
+      this.#setCellPlaceholder(cellX, cellY)
+    })
   }
 
   clearCells() {
-    this.#filledCells.forEach((cellKey) => {
+    const cellKeys = [...this.#filledCells, ...this.#placeholderCells]
+
+    cellKeys.forEach((cellKey) => {
       const [cellX, cellY] = cellKey.split(this.#cellKeyDelimiter).map(Number)
 
       this.#clearCell(cellX, cellY)
