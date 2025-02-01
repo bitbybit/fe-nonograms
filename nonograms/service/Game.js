@@ -167,10 +167,7 @@ export class Game {
     })
 
     reset.events.addEventListener('click', () => {
-      this.#resetStopwatch()
-
-      this.#canvas.clearCells()
-      this.#state.initDefaultCells()
+      this.#resetCurrentBoard()
     })
   }
 
@@ -206,6 +203,8 @@ export class Game {
 
         const { x, y, value } = detail
         this.#state.cells[y][x] = value
+
+        this.#checkResult()
       }
     )
   }
@@ -231,5 +230,24 @@ export class Game {
     this.#stopwatchWrapper.$element.classList.add('bg-secondary-subtle')
 
     this.#stopwatch.reset()
+  }
+
+  #resetCurrentBoard() {
+    this.#resetStopwatch()
+
+    this.#canvas.clearCells()
+    this.#state.initDefaultCells()
+  }
+
+  #checkResult() {
+    if (this.#state.isBoardCompleted) {
+      this.#stopwatch.stop()
+
+      alert(
+        `Great! You have solved the nonogram in ${this.#stopwatch.elapsedTimeFormatted} seconds!`
+      )
+
+      this.#resetCurrentBoard()
+    }
   }
 }
