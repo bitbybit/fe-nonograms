@@ -50,7 +50,7 @@ export class Template {
   }
 
   /**
-   * @returns {Array<Array<boolean>>}
+   * @returns {StateCells}
    */
   get cells() {
     return this.#rows.map(this.#rowToCells.bind(this))

@@ -3,14 +3,14 @@ import { Component } from 'service/ui/Component.js'
 /**
  * @typedef {{
  *   $container: HTMLElement
- *   levels: GameLevel[]
+ *   levels: Level[]
  * } & Partial<ComponentProps>} SelectorProps
  */
 
 /**
  * @typedef {{
  *   detail: {
- *     level: GameLevel
+ *     level: Level
  *     template: Template
  *   }
  * }} SelectorPayload
@@ -18,7 +18,7 @@ import { Component } from 'service/ui/Component.js'
 
 export class Selector extends Component {
   /**
-   * @type {GameLevel[]}
+   * @type {Level[]}
    */
   #levels
 
@@ -96,6 +96,31 @@ export class Selector extends Component {
         }
       })
     )
+  }
+
+  /**
+   * @param {Template} template
+   * @throws {Error}
+   */
+  select(template) {
+    /**
+     * @type {HTMLSelectElement}
+     */
+    const $element = this.$element
+
+    const optionIndex = Array.from($element.options).findIndex(
+      ({ value }) => value === template.board.name
+    )
+
+    const hasOption = optionIndex !== -1
+
+    if (!hasOption) {
+      throw new Error(
+        `No option found for template board ${template.board.name}`
+      )
+    }
+
+    $element.selectedIndex = optionIndex
   }
 
   /**

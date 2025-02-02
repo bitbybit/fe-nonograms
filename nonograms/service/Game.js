@@ -1,11 +1,12 @@
-import { GameConfig } from 'service/model/GameConfig.js'
-import { GameState } from 'service/model/GameState.js'
+import { State } from 'service/game/State.js'
 import { Container } from 'service/ui/Container.js'
 import { Selector } from 'service/ui/Selector.js'
 import { Reset } from 'service/ui/Reset.js'
 import { Stopwatch } from 'service/ui/Stopwatch.js'
 import { Canvas } from 'service/ui/Canvas.js'
 import { Sound } from 'service/ui/Sound.js'
+import { Save } from 'service/ui/Save.js'
+import { Load } from 'service/ui/Load.js'
 
 import { easyLevel } from 'service/level/easy.js'
 import { mediumLevel } from 'service/level/medium.js'
@@ -13,8 +14,20 @@ import { hardLevel } from 'service/level/hard.js'
 
 /**
  * @typedef {{
- *   levels: GameLevel[]
+ *   levels: Level[]
  * }} GameProps
+ */
+
+/**
+ * @typedef {{
+ *   refill: boolean
+ * }} DrawCanvasProps
+ */
+
+/**
+ * @typedef {{
+ *   restoreElapsedTime: boolean
+ * }} BeginStopwatchProps
  */
 
 export class Game {
@@ -25,12 +38,7 @@ export class Game {
   #soundCanvasEvents = ['clear', 'fill', 'placeholder']
 
   /**
-   * @type {GameConfig}
-   */
-  #config
-
-  /**
-   * @type {GameState}
+   * @type {State}
    */
   #state
 
@@ -38,6 +46,11 @@ export class Game {
    * @type {Container}
    */
   #container
+
+  /**
+   * @type {Selector}
+   */
+  #selector
 
   /**
    * @type {Stopwatch}
@@ -55,24 +68,30 @@ export class Game {
   #sound
 
   /**
+   * @type {Save}
+   */
+  #save
+
+  /**
+   * @type {Load}
+   */
+  #load
+
+  /**
    * @param {GameProps} props
    */
   constructor({ levels = [easyLevel, mediumLevel, hardLevel] } = {}) {
-    this.#config = new GameConfig({ levels })
+    this.#state = new State({
+      levels
+    })
 
-    this.#initState()
     this.#initContainer()
     this.#initSelector()
     this.#initReset()
     this.#initStopwatch()
     this.#initCanvas()
     this.#initSound()
-  }
-
-  #initState() {
-    this.#state = new GameState({
-      level: this.#config.levels[0]
-    })
+    this.#initLoader()
   }
 
   #initContainer() {
@@ -80,12 +99,12 @@ export class Game {
   }
 
   #initSelector() {
-    const selector = new Selector({
+    this.#selector = new Selector({
       $container: this.#container.selector.$element,
-      levels: this.#config.levels
+      levels: this.#state.levels
     })
 
-    selector.events.addEventListener(
+    this.#selector.events.addEventListener(
       'update',
       /**
        * @param {SelectorPayload} payload
@@ -140,7 +159,7 @@ export class Game {
        * @param {CanvasPayload} payload
        */
       async ({ detail }) => {
-        this.#startStopwatch()
+        this.#beginStopwatch()
 
         const { x, y, value } = detail
         this.#state.cells[y][x] = value
@@ -158,20 +177,63 @@ export class Game {
     )
   }
 
-  #drawCanvas() {
+  #initLoader() {
+    this.#save = new Save({
+      $container: this.#container.loader.$element
+    })
+
+    this.#load = new Load({
+      $container: this.#container.loader.$element
+    })
+
+    this.#save.events.addEventListener('click', () => {
+      this.#saveGame()
+    })
+
+    this.#load.events.addEventListener('click', () => {
+      this.#loadGame()
+    })
+
+    if (this.#state.hasSavedState) {
+      this.#showLoadButton()
+    }
+  }
+
+  /**
+   * @param {DrawCanvasProps} props
+   */
+  #drawCanvas({ refill = false } = {}) {
     this.#canvas.draw({
       horCellAmount: this.#state.template.horCellAmount,
       horHints: this.#state.template.horHints,
       verCellAmount: this.#state.template.verCellAmount,
       verHints: this.#state.template.verHints
     })
+
+    if (refill) {
+      this.#canvas.refillCells(this.#state.cells)
+    }
   }
 
-  #startStopwatch() {
+  /**
+   * @param {BeginStopwatchProps} props
+   */
+  #beginStopwatch({ restoreElapsedTime = false } = {}) {
     this.#container.stopwatch.$element.classList.remove('bg-secondary-subtle')
     this.#container.stopwatch.$element.classList.add('bg-dark-subtle')
 
+    if (restoreElapsedTime) {
+      this.#stopwatch.elapsedTime = this.#state.elapsedTime
+      this.#state.elapsedTime = 0
+    }
+
     this.#stopwatch.start()
+  }
+
+  #pauseStopwatch() {
+    this.#stopwatch.stop()
+
+    this.#state.elapsedTime = this.#stopwatch.elapsedTime
   }
 
   #resetStopwatch() {
@@ -188,17 +250,53 @@ export class Game {
     this.#state.initDefaultCells()
   }
 
+  #saveGame() {
+    this.#pauseStopwatch()
+    this.#state.save()
+    this.#showLoadButton()
+  }
+
+  #loadGame() {
+    this.#resetStopwatch()
+
+    this.#state.load()
+
+    this.#drawCanvas({
+      refill: true
+    })
+
+    this.#selector.select(this.#state.template)
+
+    this.#beginStopwatch({
+      restoreElapsedTime: true
+    })
+
+    this.#showSaveButton()
+  }
+
+  #showLoadButton() {
+    this.#save.$element.classList.add('d-none')
+    this.#load.$element.classList.remove('d-none')
+  }
+
+  #showSaveButton() {
+    this.#load.$element.classList.add('d-none')
+    this.#save.$element.classList.remove('d-none')
+  }
+
   async #checkResult() {
-    if (this.#state.isBoardCompleted) {
-      this.#stopwatch.stop()
-
-      await this.#sound.play('win')
-
-      alert(
-        `Great! You have solved the nonogram in ${this.#stopwatch.elapsedTimeFormatted} seconds!`
-      )
-
-      this.#resetCurrentBoard()
+    if (!this.#state.isBoardCompleted) {
+      return
     }
+
+    this.#stopwatch.stop()
+
+    await this.#sound.play('win')
+
+    alert(
+      `Great! You have solved the nonogram in ${this.#stopwatch.elapsedTimeFormatted} seconds!`
+    )
+
+    this.#resetCurrentBoard()
   }
 }

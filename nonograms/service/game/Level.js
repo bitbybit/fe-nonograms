@@ -3,10 +3,10 @@
  *   name: string
  *   templates: Template[]
  *   title: string
- * }} GameLevelProps
+ * }} LevelProps
  */
 
-export class GameLevel {
+export class Level {
   /**
    * @type {string}
    */
@@ -23,7 +23,7 @@ export class GameLevel {
   templates
 
   /**
-   * @param {GameLevelProps} props
+   * @param {LevelProps} props
    */
   constructor({ name, templates, title }) {
     this.name = name

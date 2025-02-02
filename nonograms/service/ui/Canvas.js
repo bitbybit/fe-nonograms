@@ -172,7 +172,7 @@ export class Canvas extends Component {
     this.#highlightThickVerLines()
     this.#drawHorHints()
     this.#drawVerHints()
-    this.#refillCells()
+    this.refillCells()
   }
 
   #drawHorGridLine() {
@@ -507,7 +507,22 @@ export class Canvas extends Component {
     this.#placeholderCells.add(this.#getCellKey(cellX, cellY))
   }
 
-  #refillCells() {
+  /**
+   * @param {StateCells} cells
+   */
+  refillCells(cells = []) {
+    if (cells.length > 0) {
+      this.clearCells()
+
+      for (let y = 0; y < cells.length; y += 1) {
+        for (let x = 0; x < cells[y].length; x += 1) {
+          if (cells[y][x]) {
+            this.#filledCells.add(this.#getCellKey(x, y))
+          }
+        }
+      }
+    }
+
     this.#filledCells.forEach((cellKey) => {
       const [cellX, cellY] = cellKey.split(this.#cellKeyDelimiter).map(Number)
 

@@ -21,6 +21,11 @@ export class Container extends Component {
    */
   canvas
 
+  /**
+   * @type {Component}
+   */
+  loader
+
   constructor() {
     super({
       name: 'container',
@@ -39,6 +44,7 @@ export class Container extends Component {
         'col-6',
         'p-2',
         'align-content-center',
+        'mb-auto',
         'bg-secondary-subtle'
       ],
       $container: rows.$element
@@ -50,6 +56,7 @@ export class Container extends Component {
         'col-3',
         'p-2',
         'align-content-center',
+        'mb-auto',
         'bg-secondary-subtle'
       ],
       $container: rows.$element
@@ -61,6 +68,7 @@ export class Container extends Component {
         'col-3',
         'p-2',
         'align-content-center',
+        'mb-auto',
         'text-center',
         'bg-secondary-subtle',
         'text-primary'
@@ -76,7 +84,22 @@ export class Container extends Component {
         'd-flex',
         'flex-grow-1',
         'align-items-center',
-        'justify-content-center'
+        'justify-content-center',
+        'mt-auto',
+        'mb-auto'
+      ],
+      $container: rows.$element
+    })
+
+    this.loader = new Component({
+      name: 'loader-wrapper',
+      classList: [
+        'col-12',
+        'p-2',
+        'align-content-center',
+        'text-center',
+        'mt-auto',
+        'bg-secondary-subtle'
       ],
       $container: rows.$element
     })

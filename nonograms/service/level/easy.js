@@ -1,8 +1,8 @@
-import { GameLevel } from 'service/model/GameLevel.js'
+import { Level } from 'service/game/Level.js'
 import { Template } from 'service/game/Template.js'
 import { Board } from 'service/game/Board.js'
 
-export const easyLevel = new GameLevel({
+export const easyLevel = new Level({
   name: 'easy',
   title: 'Easy',
   templates: [
