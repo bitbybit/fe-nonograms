@@ -404,8 +404,12 @@ export class Canvas extends Component {
 
     if (isFilled) {
       this.#clearCell(cellX, cellY)
+
+      this.events.dispatchEvent(new CustomEvent('clear'))
     } else {
       this.#fillCell(cellX, cellY)
+
+      this.events.dispatchEvent(new CustomEvent('fill'))
     }
   }
 
@@ -419,6 +423,8 @@ export class Canvas extends Component {
     if (isPlaceholder) {
       this.#clearCell(cellX, cellY)
 
+      this.events.dispatchEvent(new CustomEvent('clear'))
+
       return
     }
 
@@ -429,6 +435,8 @@ export class Canvas extends Component {
     }
 
     this.#setCellPlaceholder(cellX, cellY)
+
+    this.events.dispatchEvent(new CustomEvent('placeholder'))
   }
 
   /**

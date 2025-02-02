@@ -5,6 +5,7 @@ import { Selector } from 'service/ui/Selector.js'
 import { Reset } from 'service/ui/Reset.js'
 import { Stopwatch } from 'service/ui/Stopwatch.js'
 import { Canvas } from 'service/ui/Canvas.js'
+import { Sound } from 'service/ui/Sound.js'
 
 import { easyLevel } from 'service/level/easy.js'
 import { mediumLevel } from 'service/level/medium.js'
@@ -17,6 +18,12 @@ import { hardLevel } from 'service/level/hard.js'
  */
 
 export class Game {
+  /**
+   * @type {string[]}
+   * @readonly
+   */
+  #soundCanvasEvents = ['clear', 'fill', 'placeholder']
+
   /**
    * @type {GameConfig}
    */
@@ -58,6 +65,11 @@ export class Game {
   #canvas
 
   /**
+   * @type {Sound}
+   */
+  #sound
+
+  /**
    * @param {GameProps} props
    */
   constructor({ levels = [easyLevel, mediumLevel, hardLevel] } = {}) {
@@ -69,6 +81,7 @@ export class Game {
     this.#initReset()
     this.#initStopwatch()
     this.#initCanvas()
+    this.#initSound()
   }
 
   #initState() {
@@ -198,14 +211,22 @@ export class Game {
       /**
        * @param {CanvasPayload} payload
        */
-      ({ detail }) => {
+      async ({ detail }) => {
         this.#startStopwatch()
 
         const { x, y, value } = detail
         this.#state.cells[y][x] = value
 
-        this.#checkResult()
+        await this.#checkResult()
       }
+    )
+  }
+
+  #initSound() {
+    this.#sound = new Sound()
+
+    this.#soundCanvasEvents.forEach((event) =>
+      this.#canvas.events.addEventListener(event, () => this.#sound.play(event))
     )
   }
 
@@ -239,9 +260,11 @@ export class Game {
     this.#state.initDefaultCells()
   }
 
-  #checkResult() {
+  async #checkResult() {
     if (this.#state.isBoardCompleted) {
       this.#stopwatch.stop()
+
+      await this.#sound.play('win')
 
       alert(
         `Great! You have solved the nonogram in ${this.#stopwatch.elapsedTimeFormatted} seconds!`

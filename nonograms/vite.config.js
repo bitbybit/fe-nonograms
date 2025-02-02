@@ -6,9 +6,9 @@ export default defineConfig({
 
   resolve: {
     alias: {
-      style: resolve(import.meta.dirname, './style'),
+      assets: resolve(import.meta.dirname, './assets'),
       service: resolve(import.meta.dirname, './service'),
-      board: resolve(import.meta.dirname, './board')
+      style: resolve(import.meta.dirname, './style')
     }
   },
 
