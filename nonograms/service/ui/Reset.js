@@ -7,6 +7,9 @@ import { Component } from 'service/ui/Component.js'
  */
 
 export class Reset extends Component {
+  /**
+   * @param {ResetProps} props
+   */
   constructor({ $container } = {}) {
     super({
       $container,
