@@ -1,6 +1,6 @@
 import { GameLevel } from 'service/model/GameLevel.js'
-import { Template } from 'service/Template.js'
-import { Board } from 'service/Board.js'
+import { Template } from 'service/game/Template.js'
+import { Board } from 'service/game/Board.js'
 
 export const hardLevel = new GameLevel({
   name: 'hard',

@@ -1,4 +1,4 @@
-import { Board } from 'service/Board.js'
+import { Board } from 'service/game/Board.js'
 
 /**
  * @typedef {{

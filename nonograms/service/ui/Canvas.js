@@ -1,4 +1,4 @@
-import { Component } from 'service/Component.js'
+import { Component } from 'service/ui/Component.js'
 
 /**
  * @typedef {{
