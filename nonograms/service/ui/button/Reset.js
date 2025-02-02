@@ -1,12 +1,12 @@
-import { Button } from 'service/ui/Button.js'
+import { BaseButton } from 'service/ui/button/BaseButton.js'
 
 /**
  * @typedef {{
  *   $container: HTMLElement
- * } & Partial<ButtonProps>} ResetProps
+ * } & Partial<BaseButtonProps>} ResetProps
  */
 
-export class Reset extends Button {
+export class Reset extends BaseButton {
   /**
    * @param {ResetProps} props
    */
@@ -14,6 +14,7 @@ export class Reset extends Button {
     super({
       name: 'reset',
       title: 'Reset',
+      classList: ['btn-primary'],
       $container
     })
   }

@@ -26,6 +26,11 @@ export class Container extends Component {
    */
   loader
 
+  /**
+   * @type {Component}
+   */
+  theme
+
   constructor() {
     super({
       name: 'container',
@@ -94,7 +99,20 @@ export class Container extends Component {
     this.loader = new Component({
       name: 'loader-wrapper',
       classList: [
-        'col-12',
+        'col-6',
+        'p-2',
+        'align-content-center',
+        'text-center',
+        'mt-auto',
+        'bg-secondary-subtle'
+      ],
+      $container: rows.$element
+    })
+
+    this.theme = new Component({
+      name: 'theme-wrapper',
+      classList: [
+        'col-6',
         'p-2',
         'align-content-center',
         'text-center',

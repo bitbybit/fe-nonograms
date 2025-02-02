@@ -66,13 +66,33 @@ export class Canvas extends Component {
    * @type {string}
    * @readonly
    */
-  #color = '#000000'
+  #colorLight = '#212529'
 
   /**
    * @type {string}
    * @readonly
    */
-  #colorBlank = '#ffffff'
+  #colorDark = '#cccccc'
+
+  /**
+   * @type {string}
+   */
+  #color = this.#colorLight
+
+  /**
+   * @type {string}
+   */
+  #colorBlankLight = '#ffffff'
+
+  /**
+   * @type {string}
+   */
+  #colorBlankDark = '#212529'
+
+  /**
+   * @type {string}
+   */
+  #colorBlank = this.#colorBlankLight
 
   /**
    * @type {number}
@@ -560,6 +580,17 @@ export class Canvas extends Component {
     this.#ctx2d.font = `${this.#cellSize * this.#fontScale}px ${this.#fontFamily}`
     this.#ctx2d.textAlign = 'center'
     this.#ctx2d.textBaseline = 'middle'
+    this.#ctx2d.fillStyle = this.#color
+  }
+
+  setLightTheme() {
+    this.#color = this.#colorLight
+    this.#colorBlank = this.#colorBlankLight
+  }
+
+  setDarkTheme() {
+    this.#color = this.#colorDark
+    this.#colorBlank = this.#colorBlankDark
   }
 
   /**

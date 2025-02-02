@@ -5,19 +5,19 @@ import { Component } from 'service/ui/Component.js'
  *   $container: HTMLElement
  *   name: string
  *   title: string
- * } & Partial<ComponentProps>} ButtonProps
+ * } & Partial<ComponentProps>} BaseButtonProps
  */
 
-export class Button extends Component {
+export class BaseButton extends Component {
   /**
-   * @param {ButtonProps} props
+   * @param {BaseButtonProps} props
    */
   constructor({ $container, classList = [], name, title } = {}) {
     super({
-      $container,
       name,
       tagName: 'button',
-      classList: ['btn', 'btn-primary', ...classList]
+      classList: ['btn', ...classList],
+      $container
     })
 
     this.$element.innerText = title

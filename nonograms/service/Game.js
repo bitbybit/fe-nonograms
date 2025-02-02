@@ -1,12 +1,14 @@
 import { State } from 'service/game/State.js'
 import { Container } from 'service/ui/Container.js'
 import { Selector } from 'service/ui/Selector.js'
-import { Reset } from 'service/ui/Reset.js'
+import { Reset } from 'service/ui/button/Reset.js'
 import { Stopwatch } from 'service/ui/Stopwatch.js'
 import { Canvas } from 'service/ui/Canvas.js'
 import { Sound } from 'service/ui/Sound.js'
-import { Save } from 'service/ui/Save.js'
-import { Load } from 'service/ui/Load.js'
+import { Save } from 'service/ui/button/Save.js'
+import { Load } from 'service/ui/button/Load.js'
+import { Light } from 'service/ui/button/Light.js'
+import { Dark } from 'service/ui/button/Dark.js'
 
 import { easyLevel } from 'service/level/easy.js'
 import { mediumLevel } from 'service/level/medium.js'
@@ -70,12 +72,22 @@ export class Game {
   /**
    * @type {Save}
    */
-  #save
+  #saveButton
 
   /**
    * @type {Load}
    */
-  #load
+  #loadButton
+
+  /**
+   * @type {Light}
+   */
+  #themeLightButton
+
+  /**
+   * @type {Dark}
+   */
+  #themeDarkButton
 
   /**
    * @param {GameProps} props
@@ -87,11 +99,12 @@ export class Game {
 
     this.#initContainer()
     this.#initSelector()
-    this.#initReset()
+    this.#initResetButton()
     this.#initStopwatch()
     this.#initCanvas()
     this.#initSound()
     this.#initLoader()
+    this.#initTheme()
   }
 
   #initContainer() {
@@ -121,12 +134,12 @@ export class Game {
     )
   }
 
-  #initReset() {
-    const reset = new Reset({
+  #initResetButton() {
+    const resetButton = new Reset({
       $container: this.#container.reset.$element
     })
 
-    reset.events.addEventListener('click', () => {
+    resetButton.events.addEventListener('click', () => {
       this.#resetCurrentBoard()
     })
   }
@@ -178,25 +191,43 @@ export class Game {
   }
 
   #initLoader() {
-    this.#save = new Save({
+    this.#saveButton = new Save({
       $container: this.#container.loader.$element
     })
 
-    this.#load = new Load({
+    this.#loadButton = new Load({
       $container: this.#container.loader.$element
     })
 
-    this.#save.events.addEventListener('click', () => {
+    this.#saveButton.events.addEventListener('click', () => {
       this.#saveGame()
     })
 
-    this.#load.events.addEventListener('click', () => {
+    this.#loadButton.events.addEventListener('click', () => {
       this.#loadGame()
     })
 
     if (this.#state.hasSavedState) {
       this.#showLoadButton()
     }
+  }
+
+  #initTheme() {
+    this.#themeLightButton = new Light({
+      $container: this.#container.theme.$element
+    })
+
+    this.#themeDarkButton = new Dark({
+      $container: this.#container.theme.$element
+    })
+
+    this.#themeLightButton.events.addEventListener('click', () => {
+      this.#setLightTheme()
+    })
+
+    this.#themeDarkButton.events.addEventListener('click', () => {
+      this.#setDarkTheme()
+    })
   }
 
   /**
@@ -274,14 +305,42 @@ export class Game {
     this.#showSaveButton()
   }
 
+  #setLightTheme() {
+    document.documentElement.setAttribute('data-bs-theme', 'light')
+
+    this.#canvas.setLightTheme()
+    this.#drawCanvas()
+
+    this.#showDarkButton()
+  }
+
+  #setDarkTheme() {
+    document.documentElement.setAttribute('data-bs-theme', 'dark')
+
+    this.#canvas.setDarkTheme()
+    this.#drawCanvas()
+
+    this.#showLightButton()
+  }
+
   #showLoadButton() {
-    this.#save.$element.classList.add('d-none')
-    this.#load.$element.classList.remove('d-none')
+    this.#saveButton.$element.classList.add('d-none')
+    this.#loadButton.$element.classList.remove('d-none')
   }
 
   #showSaveButton() {
-    this.#load.$element.classList.add('d-none')
-    this.#save.$element.classList.remove('d-none')
+    this.#loadButton.$element.classList.add('d-none')
+    this.#saveButton.$element.classList.remove('d-none')
+  }
+
+  #showLightButton() {
+    this.#themeDarkButton.$element.classList.add('d-none')
+    this.#themeLightButton.$element.classList.remove('d-none')
+  }
+
+  #showDarkButton() {
+    this.#themeLightButton.$element.classList.add('d-none')
+    this.#themeDarkButton.$element.classList.remove('d-none')
   }
 
   async #checkResult() {

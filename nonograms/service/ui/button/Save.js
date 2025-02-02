@@ -1,12 +1,12 @@
-import { Button } from 'service/ui/Button.js'
+import { BaseButton } from 'service/ui/button/BaseButton.js'
 
 /**
  * @typedef {{
  *   $container: HTMLElement
- * } & Partial<ButtonProps>} SaveProps
+ * } & Partial<BaseButtonProps>} SaveProps
  */
 
-export class Save extends Button {
+export class Save extends BaseButton {
   /**
    * @param {SaveProps} props
    */
