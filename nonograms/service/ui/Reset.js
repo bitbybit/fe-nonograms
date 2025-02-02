@@ -1,35 +1,20 @@
-import { Component } from 'service/ui/Component.js'
+import { Button } from 'service/ui/Button.js'
 
 /**
  * @typedef {{
  *   $container: HTMLElement
- * } & Partial<ComponentProps>} ResetProps
+ * } & Partial<ButtonProps>} ResetProps
  */
 
-export class Reset extends Component {
+export class Reset extends Button {
   /**
    * @param {ResetProps} props
    */
   constructor({ $container } = {}) {
     super({
-      $container,
       name: 'reset',
-      tagName: 'button',
-      classList: ['btn', 'btn-primary']
+      title: 'Reset',
+      $container
     })
-
-    this.$element.innerText = 'Reset'
-
-    this.#initListener()
-  }
-
-  #initListener() {
-    const boundListenClick = this.#listenClick.bind(this)
-
-    this.$element.addEventListener('click', boundListenClick)
-  }
-
-  #listenClick() {
-    this.events.dispatchEvent(new CustomEvent('click'))
   }
 }
