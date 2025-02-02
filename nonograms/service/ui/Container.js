@@ -9,7 +9,7 @@ export class Container extends Component {
   /**
    * @type {Component}
    */
-  reset
+  controls
 
   /**
    * @type {Component}
@@ -46,7 +46,7 @@ export class Container extends Component {
     this.selector = new Component({
       name: 'selector-wrapper',
       classList: [
-        'col-6',
+        'col-4',
         'p-2',
         'align-content-center',
         'mb-auto',
@@ -55,10 +55,10 @@ export class Container extends Component {
       $container: rows.$element
     })
 
-    this.reset = new Component({
-      name: 'reset-wrapper',
+    this.controls = new Component({
+      name: 'controls-wrapper',
       classList: [
-        'col-3',
+        'col-6',
         'p-2',
         'align-content-center',
         'mb-auto',
@@ -70,7 +70,7 @@ export class Container extends Component {
     this.stopwatch = new Component({
       name: 'stopwatch-wrapper',
       classList: [
-        'col-3',
+        'col-2',
         'p-2',
         'align-content-center',
         'mb-auto',

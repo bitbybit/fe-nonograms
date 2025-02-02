@@ -1,6 +1,7 @@
 import { State } from 'service/game/State.js'
 import { Container } from 'service/ui/Container.js'
 import { Selector } from 'service/ui/Selector.js'
+import { Random } from 'service/ui/button/Random.js'
 import { Reset } from 'service/ui/button/Reset.js'
 import { Stopwatch } from 'service/ui/Stopwatch.js'
 import { Canvas } from 'service/ui/Canvas.js'
@@ -99,6 +100,7 @@ export class Game {
 
     this.#initContainer()
     this.#initSelector()
+    this.#initRandomButton()
     this.#initResetButton()
     this.#initStopwatch()
     this.#initCanvas()
@@ -134,9 +136,19 @@ export class Game {
     )
   }
 
+  #initRandomButton() {
+    const randomButton = new Random({
+      $container: this.#container.controls.$element
+    })
+
+    randomButton.events.addEventListener('click', () => {
+      this.#selector.selectRandom()
+    })
+  }
+
   #initResetButton() {
     const resetButton = new Reset({
-      $container: this.#container.reset.$element
+      $container: this.#container.controls.$element
     })
 
     resetButton.events.addEventListener('click', () => {

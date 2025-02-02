@@ -72,30 +72,7 @@ export class Selector extends Component {
    * @param {Event} e
    */
   #listenChange(e) {
-    const level = this.#levels.find(({ templates }) =>
-      templates.find(({ board }) => board.name === e.target.value)
-    )
-
-    if (level === undefined) {
-      throw new Error(`No level found for option ${e.target.value}`)
-    }
-
-    const template = level.templates.find(
-      ({ board }) => board.name === e.target.value
-    )
-
-    if (template === undefined) {
-      throw new Error(`No template found for option ${e.target.value}`)
-    }
-
-    this.events.dispatchEvent(
-      new CustomEvent('update', {
-        detail: {
-          level,
-          template
-        }
-      })
-    )
+    this.#dispatchUpdate(e.target.value)
   }
 
   /**
@@ -121,6 +98,47 @@ export class Selector extends Component {
     }
 
     $element.selectedIndex = optionIndex
+  }
+
+  selectRandom() {
+    /**
+     * @type {HTMLSelectElement}
+     */
+    const $element = this.$element
+
+    $element.selectedIndex = Math.floor(
+      Math.random() * ($element.options.length - 1)
+    )
+
+    this.#dispatchUpdate($element.value)
+  }
+
+  /**
+   * @param {string} value
+   */
+  #dispatchUpdate(value) {
+    const level = this.#levels.find(({ templates }) =>
+      templates.find(({ board }) => board.name === value)
+    )
+
+    if (level === undefined) {
+      throw new Error(`No level found for option ${value}`)
+    }
+
+    const template = level.templates.find(({ board }) => board.name === value)
+
+    if (template === undefined) {
+      throw new Error(`No template found for option ${value}`)
+    }
+
+    this.events.dispatchEvent(
+      new CustomEvent('update', {
+        detail: {
+          level,
+          template
+        }
+      })
+    )
   }
 
   /**
