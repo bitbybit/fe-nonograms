@@ -1,6 +1,6 @@
 import { GameConfig } from 'service/model/GameConfig.js'
 import { GameState } from 'service/model/GameState.js'
-import { Component } from 'service/ui/Component.js'
+import { Container } from 'service/ui/Container.js'
 import { Selector } from 'service/ui/Selector.js'
 import { Reset } from 'service/ui/Reset.js'
 import { Stopwatch } from 'service/ui/Stopwatch.js'
@@ -35,24 +35,9 @@ export class Game {
   #state
 
   /**
-   * @type {Component}
+   * @type {Container}
    */
-  #selectorWrapper
-
-  /**
-   * @type {Component}
-   */
-  #resetWrapper
-
-  /**
-   * @type {Component}
-   */
-  #stopwatchWrapper
-
-  /**
-   * @type {Component}
-   */
-  #canvasWrapper
+  #container
 
   /**
    * @type {Stopwatch}
@@ -91,69 +76,12 @@ export class Game {
   }
 
   #initContainer() {
-    const container = new Component({
-      name: 'container',
-      classList: ['container', 'd-flex', 'flex-column']
-    })
-
-    const rows = new Component({
-      name: 'rows',
-      classList: ['row', 'flex-grow-1'],
-      $container: container.$element
-    })
-
-    this.#selectorWrapper = new Component({
-      name: 'selector-wrapper',
-      classList: [
-        'col-6',
-        'p-2',
-        'align-content-center',
-        'bg-secondary-subtle'
-      ],
-      $container: rows.$element
-    })
-
-    this.#resetWrapper = new Component({
-      name: 'reset-wrapper',
-      classList: [
-        'col-3',
-        'p-2',
-        'align-content-center',
-        'bg-secondary-subtle'
-      ],
-      $container: rows.$element
-    })
-
-    this.#stopwatchWrapper = new Component({
-      name: 'stopwatch-wrapper',
-      classList: [
-        'col-3',
-        'p-2',
-        'align-content-center',
-        'text-center',
-        'bg-secondary-subtle',
-        'text-primary'
-      ],
-      $container: rows.$element
-    })
-
-    this.#canvasWrapper = new Component({
-      name: 'canvas-wrapper',
-      classList: [
-        'col-12',
-        'p-2',
-        'd-flex',
-        'flex-grow-1',
-        'align-items-center',
-        'justify-content-center'
-      ],
-      $container: rows.$element
-    })
+    this.#container = new Container()
   }
 
   #initSelector() {
     const selector = new Selector({
-      $container: this.#selectorWrapper.$element,
+      $container: this.#container.selector.$element,
       levels: this.#config.levels
     })
 
@@ -176,7 +104,7 @@ export class Game {
 
   #initReset() {
     const reset = new Reset({
-      $container: this.#resetWrapper.$element
+      $container: this.#container.reset.$element
     })
 
     reset.events.addEventListener('click', () => {
@@ -186,7 +114,7 @@ export class Game {
 
   #initStopwatch() {
     this.#stopwatch = new Stopwatch({
-      $container: this.#stopwatchWrapper.$element
+      $container: this.#container.stopwatch.$element
     })
   }
 
@@ -194,7 +122,7 @@ export class Game {
     const boundDrawCanvas = this.#drawCanvas.bind(this)
 
     this.#canvas = new Canvas({
-      $container: this.#canvasWrapper.$element
+      $container: this.#container.canvas.$element
     })
 
     this.#canvas.events.addEventListener('mount', () => {
@@ -240,15 +168,15 @@ export class Game {
   }
 
   #startStopwatch() {
-    this.#stopwatchWrapper.$element.classList.remove('bg-secondary-subtle')
-    this.#stopwatchWrapper.$element.classList.add('bg-dark-subtle')
+    this.#container.stopwatch.$element.classList.remove('bg-secondary-subtle')
+    this.#container.stopwatch.$element.classList.add('bg-dark-subtle')
 
     this.#stopwatch.start()
   }
 
   #resetStopwatch() {
-    this.#stopwatchWrapper.$element.classList.remove('bg-dark-subtle')
-    this.#stopwatchWrapper.$element.classList.add('bg-secondary-subtle')
+    this.#container.stopwatch.$element.classList.remove('bg-dark-subtle')
+    this.#container.stopwatch.$element.classList.add('bg-secondary-subtle')
 
     this.#stopwatch.reset()
   }
