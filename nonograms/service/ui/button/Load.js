@@ -13,7 +13,7 @@ export class Load extends Button {
   constructor({ $container } = {}) {
     super({
       name: 'load',
-      title: 'Continue last game',
+      title: 'Load',
       classList: ['btn-success', 'me-3', 'd-none'],
       $container
     })

@@ -1,9 +1,12 @@
 import { State } from 'service/game/State.js'
+import { Score } from 'service/game/Score.js'
 import { Container } from 'service/ui/Container.js'
 import { Selector } from 'service/ui/Selector.js'
 import { Stopwatch } from 'service/ui/Stopwatch.js'
 import { Canvas } from 'service/ui/Canvas.js'
 import { Sound } from 'service/ui/Sound.js'
+import { Modal } from 'service/ui/Modal.js'
+import { Table } from 'service/ui/Table.js'
 
 import { Random } from 'service/ui/button/Random.js'
 import { Reset } from 'service/ui/button/Reset.js'
@@ -12,6 +15,7 @@ import { Load } from 'service/ui/button/Load.js'
 import { Light } from 'service/ui/button/Light.js'
 import { Dark } from 'service/ui/button/Dark.js'
 import { Solution } from 'service/ui/button/Solution.js'
+import { HighScore } from 'service/ui/button/HighScore.js'
 
 import { easyLevel } from 'service/level/easy.js'
 import { mediumLevel } from 'service/level/medium.js'
@@ -48,6 +52,11 @@ export class Game {
   #state
 
   /**
+   * @type {Score}
+   */
+  #score
+
+  /**
    * @type {Container}
    */
   #container
@@ -71,6 +80,11 @@ export class Game {
    * @type {Sound}
    */
   #sound
+
+  /**
+   * @type {Modal}
+   */
+  #modal
 
   /**
    * @type {Save}
@@ -100,7 +114,9 @@ export class Game {
       levels
     })
 
-    this.#initContainer()
+    this.#score = new Score()
+    this.#container = new Container()
+    this.#modal = new Modal()
 
     this.#initSelector()
 
@@ -113,10 +129,7 @@ export class Game {
     this.#initLoaderButton()
     this.#initThemeButton()
     this.#initSolutionButton()
-  }
-
-  #initContainer() {
-    this.#container = new Container()
+    this.#initHighScoreButton()
   }
 
   #initSelector() {
@@ -149,9 +162,9 @@ export class Game {
       $container: this.#container.controlsHeader.$element
     })
 
-    randomButton.events.addEventListener('click', () => {
+    randomButton.events.addEventListener('click', () =>
       this.#selector.selectRandom()
-    })
+    )
   }
 
   #initResetButton() {
@@ -159,9 +172,9 @@ export class Game {
       $container: this.#container.controlsHeader.$element
     })
 
-    resetButton.events.addEventListener('click', () => {
+    resetButton.events.addEventListener('click', () =>
       this.#resetCurrentBoard()
-    })
+    )
   }
 
   #initLoaderButton() {
@@ -173,13 +186,9 @@ export class Game {
       $container: this.#container.controlsFooter.$element
     })
 
-    this.#saveButton.events.addEventListener('click', () => {
-      this.#saveGame()
-    })
+    this.#saveButton.events.addEventListener('click', () => this.#saveGame())
 
-    this.#loadButton.events.addEventListener('click', () => {
-      this.#loadGame()
-    })
+    this.#loadButton.events.addEventListener('click', () => this.#loadGame())
 
     if (this.#state.hasSavedState) {
       this.#displayLoadButton()
@@ -195,13 +204,13 @@ export class Game {
       $container: this.#container.theme.$element
     })
 
-    this.#themeLightButton.events.addEventListener('click', () => {
+    this.#themeLightButton.events.addEventListener('click', () =>
       this.#setLightTheme()
-    })
+    )
 
-    this.#themeDarkButton.events.addEventListener('click', () => {
+    this.#themeDarkButton.events.addEventListener('click', () =>
       this.#setDarkTheme()
-    })
+    )
   }
 
   #initSolutionButton() {
@@ -209,9 +218,17 @@ export class Game {
       $container: this.#container.controlsFooter.$element
     })
 
-    solutionButton.events.addEventListener('click', () => {
-      this.#loadSolution()
+    solutionButton.events.addEventListener('click', () => this.#loadSolution())
+  }
+
+  #initHighScoreButton() {
+    const highScoreButton = new HighScore({
+      $container: this.#container.controlsFooter.$element
     })
+
+    highScoreButton.events.addEventListener('click', async () =>
+      this.#displayScoreTable()
+    )
   }
 
   #initStopwatch() {
@@ -232,9 +249,9 @@ export class Game {
       window.addEventListener('resize', boundDrawCanvas)
     })
 
-    this.#canvas.events.addEventListener('unmount', () => {
+    this.#canvas.events.addEventListener('unmount', () =>
       window.removeEventListener('resize', boundDrawCanvas)
-    })
+    )
 
     this.#canvas.events.addEventListener(
       'update',
@@ -313,6 +330,24 @@ export class Game {
     this.#canvas.readonly = false
   }
 
+  /**
+   * @returns {Promise<void>}
+   */
+  async #saveScore() {
+    await this.#score.addRow({
+      elapsedTime: this.#stopwatch.elapsedTime,
+      elapsedTimeFormatted: this.#stopwatch.elapsedTimeFormatted,
+      level: {
+        name: this.#state.level.name,
+        title: this.#state.level.title
+      },
+      template: {
+        name: this.#state.template.board.name,
+        title: this.#state.template.title
+      }
+    })
+  }
+
   #saveGame() {
     this.#pauseStopwatch()
     this.#state.save()
@@ -385,16 +420,29 @@ export class Game {
     this.#themeDarkButton.$element.classList.remove('d-none')
   }
 
+  /**
+   * @returns {Promise<void>}
+   */
+  async #displayScoreTable() {
+    const rows = await this.#score.getLastRows()
+    const table = new Table({ rows })
+
+    this.#modal.show(table.$element)
+  }
+
+  /**
+   * @returns {Promise<void>}
+   */
   async #checkResult() {
     if (!this.#state.isBoardCompleted) {
       return
     }
 
     this.#stopwatch.stop()
-
     await this.#sound.play('win')
+    await this.#saveScore()
 
-    alert(
+    this.#modal.show(
       `Great! You have solved the nonogram in ${this.#stopwatch.elapsedTimeFormatted} seconds!`
     )
 

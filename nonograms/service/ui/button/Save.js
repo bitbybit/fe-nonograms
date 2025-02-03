@@ -13,7 +13,7 @@ export class Save extends Button {
   constructor({ $container } = {}) {
     super({
       name: 'save',
-      title: 'Save game',
+      title: 'Save',
       classList: ['btn-warning', 'me-3'],
       $container
     })
