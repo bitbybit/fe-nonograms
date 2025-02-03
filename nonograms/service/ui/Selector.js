@@ -57,7 +57,7 @@ export class Selector extends Component {
         })
 
         option.$element.setAttribute('value', value)
-        option.$element.innerText = optionTitle
+        option.$element.textContent = optionTitle
       })
     })
   }
