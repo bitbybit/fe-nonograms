@@ -5,12 +5,12 @@ import { Component } from 'service/ui/Component.js'
  *   $container: HTMLElement
  *   name: string
  *   title: string
- * } & Partial<ComponentProps>} BaseButtonProps
+ * } & Partial<ComponentProps>} ButtonProps
  */
 
-export class BaseButton extends Component {
+export class Button extends Component {
   /**
-   * @param {BaseButtonProps} props
+   * @param {ButtonProps} props
    */
   constructor({ $container, classList = [], name, title } = {}) {
     super({
@@ -20,7 +20,7 @@ export class BaseButton extends Component {
       $container
     })
 
-    this.$element.innerText = title
+    this.$element.textContent = title
 
     this.#initListener()
   }

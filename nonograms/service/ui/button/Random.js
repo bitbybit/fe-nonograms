@@ -1,12 +1,12 @@
-import { BaseButton } from 'service/ui/button/BaseButton.js'
+import { Button } from 'service/ui/button/Button.js'
 
 /**
  * @typedef {{
  *   $container: HTMLElement
- * } & Partial<BaseButtonProps>} RandomProps
+ * } & Partial<ButtonProps>} RandomProps
  */
 
-export class Random extends BaseButton {
+export class Random extends Button {
   /**
    * @param {RandomProps} props
    */

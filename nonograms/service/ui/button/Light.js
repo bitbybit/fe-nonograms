@@ -1,19 +1,19 @@
-import { BaseButton } from 'service/ui/button/BaseButton.js'
+import { Button } from 'service/ui/button/Button.js'
 
 /**
  * @typedef {{
  *   $container: HTMLElement
- * } & Partial<BaseButtonProps>} LightProps
+ * } & Partial<ButtonProps>} LightProps
  */
 
-export class Light extends BaseButton {
+export class Light extends Button {
   /**
    * @param {LightProps} props
    */
   constructor({ $container } = {}) {
     super({
       name: 'light',
-      title: 'Switch to light theme',
+      title: 'Dark ON',
       classList: ['btn-outline-light', 'd-none'],
       $container
     })

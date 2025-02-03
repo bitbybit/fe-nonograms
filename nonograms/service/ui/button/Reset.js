@@ -1,12 +1,12 @@
-import { BaseButton } from 'service/ui/button/BaseButton.js'
+import { Button } from 'service/ui/button/Button.js'
 
 /**
  * @typedef {{
  *   $container: HTMLElement
- * } & Partial<BaseButtonProps>} ResetProps
+ * } & Partial<ButtonProps>} ResetProps
  */
 
-export class Reset extends BaseButton {
+export class Reset extends Button {
   /**
    * @param {ResetProps} props
    */

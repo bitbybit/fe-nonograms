@@ -1,12 +1,12 @@
-import { BaseButton } from 'service/ui/button/BaseButton.js'
+import { Button } from 'service/ui/button/Button.js'
 
 /**
  * @typedef {{
  *   $container: HTMLElement
- * } & Partial<BaseButtonProps>} LoadProps
+ * } & Partial<ButtonProps>} LoadProps
  */
 
-export class Load extends BaseButton {
+export class Load extends Button {
   /**
    * @param {LoadProps} props
    */
@@ -14,7 +14,7 @@ export class Load extends BaseButton {
     super({
       name: 'load',
       title: 'Continue last game',
-      classList: ['btn-success', 'd-none'],
+      classList: ['btn-success', 'me-3', 'd-none'],
       $container
     })
   }

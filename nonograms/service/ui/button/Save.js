@@ -1,12 +1,12 @@
-import { BaseButton } from 'service/ui/button/BaseButton.js'
+import { Button } from 'service/ui/button/Button.js'
 
 /**
  * @typedef {{
  *   $container: HTMLElement
- * } & Partial<BaseButtonProps>} SaveProps
+ * } & Partial<ButtonProps>} SaveProps
  */
 
-export class Save extends BaseButton {
+export class Save extends Button {
   /**
    * @param {SaveProps} props
    */
@@ -14,7 +14,7 @@ export class Save extends BaseButton {
     super({
       name: 'save',
       title: 'Save game',
-      classList: ['btn-warning'],
+      classList: ['btn-warning', 'me-3'],
       $container
     })
   }
