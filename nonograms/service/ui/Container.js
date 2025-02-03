@@ -9,7 +9,12 @@ export class Container extends Component {
   /**
    * @type {Component}
    */
-  controls
+  controlsHeader
+
+  /**
+   * @type {Component}
+   */
+  controlsFooter
 
   /**
    * @type {Component}
@@ -20,11 +25,6 @@ export class Container extends Component {
    * @type {Component}
    */
   canvas
-
-  /**
-   * @type {Component}
-   */
-  loader
 
   /**
    * @type {Component}
@@ -55,8 +55,8 @@ export class Container extends Component {
       $container: rows.$element
     })
 
-    this.controls = new Component({
-      name: 'controls-wrapper',
+    this.controlsHeader = new Component({
+      name: 'controls-header-wrapper',
       classList: [
         'col-6',
         'p-2',
@@ -96,13 +96,12 @@ export class Container extends Component {
       $container: rows.$element
     })
 
-    this.loader = new Component({
-      name: 'loader-wrapper',
+    this.controlsFooter = new Component({
+      name: 'controls-footer-wrapper',
       classList: [
-        'col-6',
+        'col-8',
         'p-2',
         'align-content-center',
-        'text-center',
         'mt-auto',
         'bg-secondary-subtle'
       ],
@@ -112,10 +111,10 @@ export class Container extends Component {
     this.theme = new Component({
       name: 'theme-wrapper',
       classList: [
-        'col-6',
+        'col-4',
         'p-2',
         'align-content-center',
-        'text-center',
+        'text-end',
         'mt-auto',
         'bg-secondary-subtle'
       ],

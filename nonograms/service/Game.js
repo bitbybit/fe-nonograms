@@ -1,15 +1,17 @@
 import { State } from 'service/game/State.js'
 import { Container } from 'service/ui/Container.js'
 import { Selector } from 'service/ui/Selector.js'
-import { Random } from 'service/ui/button/Random.js'
-import { Reset } from 'service/ui/button/Reset.js'
 import { Stopwatch } from 'service/ui/Stopwatch.js'
 import { Canvas } from 'service/ui/Canvas.js'
 import { Sound } from 'service/ui/Sound.js'
+
+import { Random } from 'service/ui/button/Random.js'
+import { Reset } from 'service/ui/button/Reset.js'
 import { Save } from 'service/ui/button/Save.js'
 import { Load } from 'service/ui/button/Load.js'
 import { Light } from 'service/ui/button/Light.js'
 import { Dark } from 'service/ui/button/Dark.js'
+import { Solution } from 'service/ui/button/Solution.js'
 
 import { easyLevel } from 'service/level/easy.js'
 import { mediumLevel } from 'service/level/medium.js'
@@ -99,14 +101,18 @@ export class Game {
     })
 
     this.#initContainer()
+
     this.#initSelector()
-    this.#initRandomButton()
-    this.#initResetButton()
+
     this.#initStopwatch()
     this.#initCanvas()
     this.#initSound()
-    this.#initLoader()
-    this.#initTheme()
+
+    this.#initRandomButton()
+    this.#initResetButton()
+    this.#initLoaderButton()
+    this.#initThemeButton()
+    this.#initSolutionButton()
   }
 
   #initContainer() {
@@ -132,13 +138,15 @@ export class Game {
 
         this.#canvas.clearCells()
         this.#drawCanvas()
+
+        this.#canvas.readonly = false
       }
     )
   }
 
   #initRandomButton() {
     const randomButton = new Random({
-      $container: this.#container.controls.$element
+      $container: this.#container.controlsHeader.$element
     })
 
     randomButton.events.addEventListener('click', () => {
@@ -148,11 +156,61 @@ export class Game {
 
   #initResetButton() {
     const resetButton = new Reset({
-      $container: this.#container.controls.$element
+      $container: this.#container.controlsHeader.$element
     })
 
     resetButton.events.addEventListener('click', () => {
       this.#resetCurrentBoard()
+    })
+  }
+
+  #initLoaderButton() {
+    this.#saveButton = new Save({
+      $container: this.#container.controlsFooter.$element
+    })
+
+    this.#loadButton = new Load({
+      $container: this.#container.controlsFooter.$element
+    })
+
+    this.#saveButton.events.addEventListener('click', () => {
+      this.#saveGame()
+    })
+
+    this.#loadButton.events.addEventListener('click', () => {
+      this.#loadGame()
+    })
+
+    if (this.#state.hasSavedState) {
+      this.#displayLoadButton()
+    }
+  }
+
+  #initThemeButton() {
+    this.#themeLightButton = new Light({
+      $container: this.#container.theme.$element
+    })
+
+    this.#themeDarkButton = new Dark({
+      $container: this.#container.theme.$element
+    })
+
+    this.#themeLightButton.events.addEventListener('click', () => {
+      this.#setLightTheme()
+    })
+
+    this.#themeDarkButton.events.addEventListener('click', () => {
+      this.#setDarkTheme()
+    })
+  }
+
+  #initSolutionButton() {
+    const solutionButton = new Solution({
+      $container: this.#container.controlsFooter.$element
+    })
+
+    solutionButton.events.addEventListener('click', () => {
+      this.#loadSolution()
     })
   }
 
@@ -200,46 +258,6 @@ export class Game {
     this.#soundCanvasEvents.forEach((event) =>
       this.#canvas.events.addEventListener(event, () => this.#sound.play(event))
     )
-  }
-
-  #initLoader() {
-    this.#saveButton = new Save({
-      $container: this.#container.loader.$element
-    })
-
-    this.#loadButton = new Load({
-      $container: this.#container.loader.$element
-    })
-
-    this.#saveButton.events.addEventListener('click', () => {
-      this.#saveGame()
-    })
-
-    this.#loadButton.events.addEventListener('click', () => {
-      this.#loadGame()
-    })
-
-    if (this.#state.hasSavedState) {
-      this.#showLoadButton()
-    }
-  }
-
-  #initTheme() {
-    this.#themeLightButton = new Light({
-      $container: this.#container.theme.$element
-    })
-
-    this.#themeDarkButton = new Dark({
-      $container: this.#container.theme.$element
-    })
-
-    this.#themeLightButton.events.addEventListener('click', () => {
-      this.#setLightTheme()
-    })
-
-    this.#themeDarkButton.events.addEventListener('click', () => {
-      this.#setDarkTheme()
-    })
   }
 
   /**
@@ -291,12 +309,14 @@ export class Game {
 
     this.#canvas.clearCells()
     this.#state.initDefaultCells()
+
+    this.#canvas.readonly = false
   }
 
   #saveGame() {
     this.#pauseStopwatch()
     this.#state.save()
-    this.#showLoadButton()
+    this.#displayLoadButton()
   }
 
   #loadGame() {
@@ -314,7 +334,17 @@ export class Game {
       restoreElapsedTime: true
     })
 
-    this.#showSaveButton()
+    this.#displaySaveButton()
+
+    this.#canvas.readonly = false
+  }
+
+  #loadSolution() {
+    this.#resetCurrentBoard()
+
+    this.#canvas.readonly = true
+
+    this.#canvas.refillCells(this.#state.template.cells)
   }
 
   #setLightTheme() {
@@ -323,7 +353,7 @@ export class Game {
     this.#canvas.setLightTheme()
     this.#drawCanvas()
 
-    this.#showDarkButton()
+    this.#displayDarkButton()
   }
 
   #setDarkTheme() {
@@ -332,25 +362,25 @@ export class Game {
     this.#canvas.setDarkTheme()
     this.#drawCanvas()
 
-    this.#showLightButton()
+    this.#displayLightButton()
   }
 
-  #showLoadButton() {
+  #displayLoadButton() {
     this.#saveButton.$element.classList.add('d-none')
     this.#loadButton.$element.classList.remove('d-none')
   }
 
-  #showSaveButton() {
+  #displaySaveButton() {
     this.#loadButton.$element.classList.add('d-none')
     this.#saveButton.$element.classList.remove('d-none')
   }
 
-  #showLightButton() {
+  #displayLightButton() {
     this.#themeDarkButton.$element.classList.add('d-none')
     this.#themeLightButton.$element.classList.remove('d-none')
   }
 
-  #showDarkButton() {
+  #displayDarkButton() {
     this.#themeLightButton.$element.classList.add('d-none')
     this.#themeDarkButton.$element.classList.remove('d-none')
   }

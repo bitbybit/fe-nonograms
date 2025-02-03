@@ -143,6 +143,11 @@ export class Canvas extends Component {
   #placeholderCells = new Set()
 
   /**
+   * @type {boolean}
+   */
+  readonly = false
+
+  /**
    * @param {CanvasProps} props
    */
   constructor({ $container, ...componentProps } = {}) {
@@ -316,6 +321,10 @@ export class Canvas extends Component {
    * @param {PointerEvent} event
    */
   #handleClick(event) {
+    if (this.readonly) {
+      return
+    }
+
     const { isInCells, cellX, cellY } = this.#offsetToCell(event)
 
     if (isInCells) {
@@ -329,6 +338,10 @@ export class Canvas extends Component {
    */
   #handleRightClick(event) {
     event.preventDefault()
+
+    if (this.readonly) {
+      return
+    }
 
     const { isInCells, cellX, cellY } = this.#offsetToCell(event)
 

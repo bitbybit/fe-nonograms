@@ -6,9 +6,9 @@ $header-border-radius: 8px;
 }
 
 [data-name="selector-wrapper"],
-[data-name="controls-wrapper"],
+[data-name="controls-header-wrapper"],
+[data-name="controls-footer-wrapper"],
 [data-name="stopwatch-wrapper"],
-[data-name="loader-wrapper"],
 [data-name="theme-wrapper"] {
   height: 60px;
 }
@@ -21,7 +21,7 @@ $header-border-radius: 8px;
   border-bottom-right-radius: $header-border-radius;
 }
 
-[data-name="loader-wrapper"] {
+[data-name="controls-footer-wrapper"] {
   border-top-left-radius: $header-border-radius;
 }
 
