@@ -14,7 +14,7 @@ export class Solution extends Button {
     super({
       name: 'solution',
       title: 'Solution',
-      classList: ['btn-primary', 'me-3'],
+      classList: ['btn-primary', 'me-2'],
       $container
     })
   }

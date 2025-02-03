@@ -30,7 +30,7 @@ export class Selector extends Component {
       $container,
       name: 'selector',
       tagName: 'select',
-      classList: ['form-select']
+      classList: ['form-select', 'd-inline-block', 'align-bottom', 'me-2']
     })
 
     this.#levels = levels

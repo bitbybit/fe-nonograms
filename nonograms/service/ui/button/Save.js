@@ -14,7 +14,7 @@ export class Save extends Button {
     super({
       name: 'save',
       title: 'Save',
-      classList: ['btn-warning', 'me-3'],
+      classList: ['btn-warning', 'me-2'],
       $container
     })
   }

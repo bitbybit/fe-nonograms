@@ -4,11 +4,6 @@ export class Container extends Component {
   /**
    * @type {Component}
    */
-  selector
-
-  /**
-   * @type {Component}
-   */
   controlsHeader
 
   /**
@@ -43,22 +38,10 @@ export class Container extends Component {
       $container: this.$element
     })
 
-    this.selector = new Component({
-      name: 'selector-wrapper',
-      classList: [
-        'col-4',
-        'p-2',
-        'align-content-center',
-        'mb-auto',
-        'bg-secondary-subtle'
-      ],
-      $container: rows.$element
-    })
-
     this.controlsHeader = new Component({
       name: 'controls-header-wrapper',
       classList: [
-        'col-6',
+        'col-10',
         'p-2',
         'align-content-center',
         'mb-auto',

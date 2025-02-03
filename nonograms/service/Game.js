@@ -134,7 +134,7 @@ export class Game {
 
   #initSelector() {
     this.#selector = new Selector({
-      $container: this.#container.selector.$element,
+      $container: this.#container.controlsHeader.$element,
       levels: this.#state.levels
     })
 

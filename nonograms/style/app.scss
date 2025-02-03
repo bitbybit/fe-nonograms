@@ -1,11 +1,18 @@
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+
 $header-border-radius: 8px;
 
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
 [data-name="container"] {
-  min-height: 100vh;
+  min-height: 100%;
   max-width: 600px;
 }
 
-[data-name="selector-wrapper"],
 [data-name="controls-header-wrapper"],
 [data-name="controls-footer-wrapper"],
 [data-name="stopwatch-wrapper"],
@@ -13,7 +20,7 @@ $header-border-radius: 8px;
   height: 60px;
 }
 
-[data-name="selector-wrapper"] {
+[data-name="controls-header-wrapper"] {
   border-bottom-left-radius: $header-border-radius;
 }
 
@@ -31,4 +38,16 @@ $header-border-radius: 8px;
 
 [data-name="canvas-wrapper"] {
   height: 100%;
+}
+
+[data-name="selector"] {
+  width: auto;
+
+  @media (max-width: 429px) {
+    max-width: 140px;
+  }
+
+  @media (max-width: 375px) {
+    max-width: 125px;
+  }
 }

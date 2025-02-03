@@ -14,7 +14,7 @@ export class Random extends Button {
     super({
       name: 'random',
       title: 'Random',
-      classList: ['btn-primary', 'me-3'],
+      classList: ['btn-primary', 'me-2'],
       $container
     })
   }
