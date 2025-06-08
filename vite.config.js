@@ -2,8 +2,6 @@ import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  base: 'https://rolling-scopes-school.github.io/bitbybit-JSFE2024Q4/nonograms/',
-
   resolve: {
     alias: {
       assets: resolve(import.meta.dirname, './assets'),
